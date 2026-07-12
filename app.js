@@ -9,6 +9,7 @@ const loginForm = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
 const resetPasswordForm = document.getElementById('reset-password-form');
 const userEmailSpan = document.getElementById('user-email');
+const sidebarUserEmail = document.getElementById('sidebar-user-email');
 const errorMessages = document.querySelectorAll('.error-message');
 const successMessages = document.querySelectorAll('.success-message');
 
@@ -17,6 +18,10 @@ const balanceValue = document.getElementById('balance-value');
 const profitValue = document.getElementById('profit-value');
 const roiValue = document.getElementById('roi-value');
 const activeInvestmentsContainer = document.getElementById('active-investments');
+
+// Balance display elements for deposit/withdraw sections
+const depositBalance = document.getElementById('deposit-balance');
+const withdrawBalance = document.getElementById('withdraw-balance');
 
 // =====================================================
 // Authentication Functions
@@ -61,6 +66,84 @@ function showAuthForm(formId) {
     hideAllMessages();
     document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
     document.getElementById(formId).classList.add('active');
+}
+
+// =====================================================
+// Navigation Functions
+// =====================================================
+
+/**
+ * Navigate to a specific dashboard section
+ * Shows the target section and hides all others, highlights active sidebar link
+ * @param {string} sectionId - The section ID to navigate to (home, trading-ai, deposit, withdraw, contact)
+ */
+function navigateTo(sectionId) {
+    // Map section IDs to their corresponding elements
+    const sectionIds = ['home', 'trading-ai', 'deposit', 'withdraw', 'contact'];
+    
+    // Hide all sections
+    sectionIds.forEach(id => {
+        const section = document.getElementById(`section-${id}`);
+        if (section) {
+            section.classList.remove('active');
+        }
+    });
+    
+    // Remove active class from all nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Show the target section
+    const targetSection = document.getElementById(`section-${sectionId}`);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+    
+    // Highlight the active nav item
+    const activeNavItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
+    if (activeNavItem) {
+        activeNavItem.classList.add('active');
+    }
+    
+    // Refresh balance displays when navigating to deposit or withdraw sections
+    if (sectionId === 'deposit' || sectionId === 'withdraw') {
+        refreshBalanceDisplay();
+    }
+}
+
+// Make navigateTo globally available for onclick handlers
+window.navigateTo = navigateTo;
+
+/**
+ * Toggle mobile menu visibility
+ */
+function toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('mobile-open');
+}
+
+// Make toggleMobileMenu globally available
+window.toggleMobileMenu = toggleMobileMenu;
+
+/**
+ * Refresh balance display in deposit and withdraw sections
+ */
+async function refreshBalanceDisplay() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('balance')
+        .eq('id', user.id)
+        .single();
+    
+    const balance = profile?.balance || 0;
+    const formattedBalance = formatCurrency(balance);
+    
+    if (depositBalance) depositBalance.textContent = formattedBalance;
+    if (withdrawBalance) withdrawBalance.textContent = formattedBalance;
 }
 
 // Form navigation event listeners
@@ -238,6 +321,10 @@ async function loadDashboard(user) {
     if (!user) return;
 
     try {
+        // Update user email in both header and sidebar
+        userEmailSpan.textContent = user.email;
+        if (sidebarUserEmail) sidebarUserEmail.textContent = user.email;
+
         // Fetch user's profile for balance
         const { data: profile, error: profileError } = await supabase
             .from('profiles')
@@ -282,6 +369,11 @@ async function loadDashboard(user) {
         profitValue.textContent = formatCurrency(totalProfit);
         roiValue.textContent = overallROI.toFixed(1) + '%';
 
+        // Update balance displays in deposit/withdraw sections
+        const formattedBalance = formatCurrency(balance);
+        if (depositBalance) depositBalance.textContent = formattedBalance;
+        if (withdrawBalance) withdrawBalance.textContent = formattedBalance;
+
         // Update active investments list
         renderActiveInvestments(activeInv || []);
 
@@ -322,6 +414,158 @@ function renderActiveInvestments(investments) {
 
     activeInvestmentsContainer.innerHTML = html;
 }
+
+// =====================================================
+// Deposit Function
+// =====================================================
+
+/**
+ * Handle deposit form submission
+ * Calls supabase.rpc('deposit', { amount }) to add funds
+ */
+document.getElementById('deposit-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        showDepositMessage('Please log in to make a deposit.', 'error');
+        return;
+    }
+    
+    const amountInput = document.getElementById('deposit-amount');
+    const amount = parseFloat(amountInput.value);
+    const messageEl = document.getElementById('deposit-message');
+    
+    // Validate amount
+    if (!amount || isNaN(amount) || amount <= 0) {
+        showDepositMessage('Please enter a valid amount greater than 0.', 'error');
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabase.rpc('deposit', { amount });
+        
+        if (error) {
+            showDepositMessage(`Deposit failed: ${error.message}`, 'error');
+        } else {
+            showDepositMessage('Deposit successful! Your balance has been updated.', 'success');
+            amountInput.value = '';
+            
+            // Refresh dashboard data
+            await loadDashboard(user);
+        }
+    } catch (err) {
+        showDepositMessage(`An error occurred: ${err.message}`, 'error');
+    }
+});
+
+/**
+ * Show deposit message with appropriate styling
+ * @param {string} message - The message to display
+ * @param {string} type - Message type ('success' or 'error')
+ */
+function showDepositMessage(message, type) {
+    const messageEl = document.getElementById('deposit-message');
+    if (messageEl) {
+        messageEl.textContent = message;
+        messageEl.className = `transaction-message ${type}`;
+    }
+}
+
+// =====================================================
+// Withdraw Function
+// =====================================================
+
+/**
+ * Handle withdraw form submission
+ * Calls supabase.rpc('withdraw', { amount }) to transfer funds out
+ * Validates sufficient balance on client side
+ */
+document.getElementById('withdraw-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        showWithdrawMessage('Please log in to make a withdrawal.', 'error');
+        return;
+    }
+    
+    const amountInput = document.getElementById('withdraw-amount');
+    const amount = parseFloat(amountInput.value);
+    const messageEl = document.getElementById('withdraw-message');
+    
+    // Validate amount
+    if (!amount || isNaN(amount) || amount <= 0) {
+        showWithdrawMessage('Please enter a valid amount greater than 0.', 'error');
+        return;
+    }
+    
+    // Get current balance for client-side validation
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('balance')
+        .eq('id', user.id)
+        .single();
+    
+    const currentBalance = profile?.balance || 0;
+    
+    if (amount > currentBalance) {
+        showWithdrawMessage(`Insufficient balance. Available: ${formatCurrency(currentBalance)}`, 'error');
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabase.rpc('withdraw', { amount });
+        
+        if (error) {
+            showWithdrawMessage(`Withdrawal failed: ${error.message}`, 'error');
+        } else {
+            showWithdrawMessage('Withdrawal successful! Funds have been transferred.', 'success');
+            amountInput.value = '';
+            
+            // Refresh dashboard data
+            await loadDashboard(user);
+        }
+    } catch (err) {
+        showWithdrawMessage(`An error occurred: ${err.message}`, 'error');
+    }
+});
+
+/**
+ * Show withdrawal message with appropriate styling
+ * @param {string} message - The message to display
+ * @param {string} type - Message type ('success' or 'error')
+ */
+function showWithdrawMessage(message, type) {
+    const messageEl = document.getElementById('withdraw-message');
+    if (messageEl) {
+        messageEl.textContent = message;
+        messageEl.className = `transaction-message ${type}`;
+    }
+}
+
+// =====================================================
+// Contact Form Handler
+// =====================================================
+
+/**
+ * Handle contact support form submission
+ * Shows success alert (UI only, no backend)
+ */
+document.getElementById('contact-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    // Get form values
+    const name = document.getElementById('contact-name').value;
+    const email = document.getElementById('contact-email').value;
+    const message = document.getElementById('contact-message').value;
+    
+    // Show success alert (UI only)
+    alert(`Thank you, ${name}! Your message has been sent. We'll get back to you at ${email} soon.`);
+    
+    // Reset the form
+    document.getElementById('contact-form').reset();
+});
 
 // =====================================================
 // Investment Function (Global)
@@ -405,9 +649,13 @@ supabase.auth.onAuthStateChange(async (event, session) => {
         authContainer.classList.add('hidden');
         dashboardContainer.classList.remove('hidden');
         userEmailSpan.textContent = session.user.email;
+        if (sidebarUserEmail) sidebarUserEmail.textContent = session.user.email;
         
         // Load dashboard data
         await loadDashboard(session.user);
+        
+        // Navigate to Home section by default
+        navigateTo('home');
     } else {
         // User is logged out
         authContainer.classList.remove('hidden');
@@ -417,6 +665,8 @@ supabase.auth.onAuthStateChange(async (event, session) => {
         balanceValue.textContent = '$0.00';
         profitValue.textContent = '$0.00';
         roiValue.textContent = '0%';
+        if (depositBalance) depositBalance.textContent = '$0.00';
+        if (withdrawBalance) withdrawBalance.textContent = '$0.00';
         activeInvestmentsContainer.innerHTML = `
             <p class="no-investments">No active investments yet. Choose a tier above to start earning!</p>
         `;
@@ -438,7 +688,10 @@ async function checkSession() {
         authContainer.classList.add('hidden');
         dashboardContainer.classList.remove('hidden');
         userEmailSpan.textContent = session.user.email;
+        if (sidebarUserEmail) sidebarUserEmail.textContent = session.user.email;
         await loadDashboard(session.user);
+        // Navigate to Home section by default
+        navigateTo('home');
     }
 }
 
