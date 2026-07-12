@@ -599,45 +599,43 @@ function showDepositMessage(message, type) {
  * Load user's deposit history with chain information
  */
 async function loadDepositHistory() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    
-    try {
-        const { data: deposits, error } = await supabase
-            .from('deposits')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-        
-        const container = document.getElementById('deposit-history');
-        if (!container) return;
-        
-        if (!deposits || deposits.length === 0) {
-            container.innerHTML = '<tr><td colspan="5" class="empty-state">No transactions yet.</td></tr>';
-            return;
-        }
-        
-        container.innerHTML = deposits.map(deposit => {
-            const network = (deposit.chain || 'bsc').toUpperCase();
-            const statusClass = deposit.status === 'pending' ? 'status-pending' : 
-                               deposit.status === 'approved' ? 'status-approved' : 'status-rejected';
-            const txHash = deposit.tx_hash || deposit.transaction_hash || 'N/A';
-            const txDisplay = txHash.length > 20 ? txHash.substring(0, 10) + '...' + txHash.substring(txHash.length - 8) : txHash;
-            
-            return `
-                <tr>
-                    <td class="amount-cell">$${parseFloat(deposit.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                    <td><span class="chain-badge ${deposit.chain || 'bsc'}">${network}</span></td>
-                    <td class="txhash-cell"><code class="txhash">${txDisplay}</code></td>
-                    <td><span class="status-badge ${statusClass}">${deposit.status}</span></td>
-                    <td class="date-cell">${new Date(deposit.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                </tr>
-            `;
-        }).join('');
-        
-    } catch (error) {
-        console.error('Error loading deposit history:', error);
-    }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  
+  const container = document.getElementById('deposit-history');
+  if (!container) return;
+  
+  const { data: deposits, error } = await supabase
+    .from('deposits')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    container.innerHTML = '<p style="color:red;">Error loading deposits.</p>';
+    console.error('Deposit fetch error:', error);
+    return;
+  }
+  
+  if (!deposits || deposits.length === 0) {
+    container.innerHTML = '<p>No deposit transactions yet.</p>';
+    return;
+  }
+  
+  let html = '<table style="width:100%;border-collapse:collapse;margin-top:10px;">';
+  html += '<thead><tr><th>Amount</th><th>Network</th><th>TX Hash</th><th>Status</th><th>Date</th></tr></thead><tbody>';
+  deposits.forEach(d => {
+    const statusColor = d.status === 'approved' ? '#00cc66' : d.status === 'rejected' ? '#ff4444' : '#ffaa00';
+    html += `<tr>
+      <td>$${d.amount}</td>
+      <td>${d.chain?.toUpperCase() || 'N/A'}</td>
+      <td>${d.transaction_hash ? d.transaction_hash.substring(0,10)+'...' : 'N/A'}</td>
+      <td style="color:${statusColor};font-weight:bold;">${d.status.toUpperCase()}</td>
+      <td>${new Date(d.created_at).toLocaleDateString()}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 // Make loadDepositHistory globally available
@@ -758,41 +756,42 @@ function showWithdrawMessage(message, type) {
  * Load user's withdrawal history
  */
 async function loadWithdrawalHistory() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-    
-    try {
-        const { data: withdrawals, error } = await supabase
-            .from('withdrawals')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
-        
-        const container = document.getElementById('withdrawal-history');
-        if (!container) return;
-        
-        if (!withdrawals || withdrawals.length === 0) {
-            container.innerHTML = '<tr><td colspan="4" class="empty-state">No transactions yet.</td></tr>';
-            return;
-        }
-        
-        container.innerHTML = withdrawals.map(withdrawal => {
-            const statusClass = withdrawal.status === 'pending' ? 'status-pending' : 
-                               withdrawal.status === 'approved' ? 'status-approved' : 'status-rejected';
-            
-            return `
-                <tr>
-                    <td class="amount-cell">$${parseFloat(withdrawal.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-                    <td class="method-cell">${withdrawal.method.charAt(0).toUpperCase() + withdrawal.method.slice(1)}</td>
-                    <td><span class="status-badge ${statusClass}">${withdrawal.status}</span></td>
-                    <td class="date-cell">${new Date(withdrawal.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                </tr>
-            `;
-        }).join('');
-        
-    } catch (error) {
-        console.error('Error loading withdrawal history:', error);
-    }
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  
+  const container = document.getElementById('withdrawal-history');
+  if (!container) return;
+  
+  const { data: withdrawals, error } = await supabase
+    .from('withdrawals')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    container.innerHTML = '<p style="color:red;">Error loading withdrawals.</p>';
+    console.error('Withdrawal fetch error:', error);
+    return;
+  }
+  
+  if (!withdrawals || withdrawals.length === 0) {
+    container.innerHTML = '<p>No withdrawal transactions yet.</p>';
+    return;
+  }
+  
+  let html = '<table style="width:100%;border-collapse:collapse;margin-top:10px;">';
+  html += '<thead><tr><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead><tbody>';
+  withdrawals.forEach(w => {
+    const statusColor = w.status === 'approved' ? '#00cc66' : w.status === 'rejected' ? '#ff4444' : '#ffaa00';
+    html += `<tr>
+      <td>$${w.amount}</td>
+      <td>${w.method || 'N/A'}</td>
+      <td style="color:${statusColor};font-weight:bold;">${w.status.toUpperCase()}</td>
+      <td>${new Date(w.created_at).toLocaleDateString()}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
 }
 
 // Make loadWithdrawalHistory globally available
