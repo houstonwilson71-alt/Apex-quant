@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authentication - Apex Quant</title>
+    <title>Apex Quant - Investment Platform</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -98,18 +98,95 @@
         </div>
 
         <!-- Dashboard Container -->
-        <div id="dashboard-container" class="card dashboard hidden">
-            <h1>Dashboard</h1>
-            <p class="subtitle">Welcome to your account</p>
-
-            <div class="user-info">
-                <p class="label">Logged in as</p>
-                <p id="user-email" class="email"></p>
+        <div id="dashboard-container" class="dashboard hidden">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div class="card">
+                    <h1>Investment Dashboard</h1>
+                    <p class="subtitle">Welcome back, <span id="user-email">User</span></p>
+                </div>
             </div>
 
-            <p class="welcome">You're successfully authenticated!</p>
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="card stat-card">
+                    <div class="stat-label">Account Balance</div>
+                    <div class="stat-value" id="balance-value">$0.00</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-label">Total Profit Earned</div>
+                    <div class="stat-value profit" id="profit-value">$0.00</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-label">Overall ROI</div>
+                    <div class="stat-value roi" id="roi-value">0%</div>
+                </div>
+            </div>
 
-            <button id="logout-btn" class="btn btn-primary">Sign Out</button>
+            <!-- Investment Tiers -->
+            <div class="section-title">Investment Tiers</div>
+            <p class="section-subtitle">Choose a tier and start earning guaranteed returns in 14 days!</p>
+            
+            <div class="tiers-grid">
+                <!-- Tier 1 -->
+                <div class="card tier-card tier-1">
+                    <div class="tier-badge">Tier 1</div>
+                    <div class="tier-roi">100% ROI</div>
+                    <div class="tier-range">$100 - $499</div>
+                    <div class="tier-term">14 days</div>
+                    <div class="tier-input-group">
+                        <input type="number" id="amount-tier-1" placeholder="Amount" min="100" max="499">
+                        <button class="btn btn-primary" onclick="invest(1)">Invest</button>
+                    </div>
+                </div>
+
+                <!-- Tier 2 -->
+                <div class="card tier-card tier-2">
+                    <div class="tier-badge">Tier 2</div>
+                    <div class="tier-roi">150% ROI</div>
+                    <div class="tier-range">$500 - $3,999</div>
+                    <div class="tier-term">14 days</div>
+                    <div class="tier-input-group">
+                        <input type="number" id="amount-tier-2" placeholder="Amount" min="500" max="3999">
+                        <button class="btn btn-primary" onclick="invest(2)">Invest</button>
+                    </div>
+                </div>
+
+                <!-- Tier 3 -->
+                <div class="card tier-card tier-3">
+                    <div class="tier-badge">Tier 3</div>
+                    <div class="tier-roi">200% ROI</div>
+                    <div class="tier-range">$4,000 - $9,999</div>
+                    <div class="tier-term">14 days</div>
+                    <div class="tier-input-group">
+                        <input type="number" id="amount-tier-3" placeholder="Amount" min="4000" max="9999">
+                        <button class="btn btn-primary" onclick="invest(3)">Invest</button>
+                    </div>
+                </div>
+
+                <!-- Tier 4 -->
+                <div class="card tier-card tier-4">
+                    <div class="tier-badge">Tier 4</div>
+                    <div class="tier-roi">300% ROI</div>
+                    <div class="tier-range">$10,000+</div>
+                    <div class="tier-term">14 days</div>
+                    <div class="tier-input-group">
+                        <input type="number" id="amount-tier-4" placeholder="Amount" min="10000">
+                        <button class="btn btn-primary" onclick="invest(4)">Invest</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Investments -->
+            <div class="section-title">Active Investments</div>
+            <div id="active-investments" class="card investments-list">
+                <p class="no-investments">No active investments yet. Choose a tier above to start earning!</p>
+            </div>
+
+            <!-- Logout Button -->
+            <div class="dashboard-footer">
+                <button id="logout-btn" class="btn btn-secondary">Sign Out</button>
+            </div>
         </div>
     </div>
 
