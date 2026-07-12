@@ -73,36 +73,43 @@ ALTER TABLE deposits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE withdrawals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE balance_adjustments ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS users_own_profile ON profiles;
 CREATE POLICY users_own_profile
 ON profiles
 FOR SELECT
 USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS users_own_investments ON investments;
 CREATE POLICY users_own_investments
 ON investments
 FOR SELECT
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS users_own_investments_insert ON investments;
 CREATE POLICY users_own_investments_insert
 ON investments
 FOR INSERT
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS users_own_deposits ON deposits;
 CREATE POLICY users_own_deposits
 ON deposits
 FOR SELECT
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS users_own_deposits_insert ON deposits;
 CREATE POLICY users_own_deposits_insert
 ON deposits
 FOR INSERT
 WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS users_own_withdrawals ON withdrawals;
 CREATE POLICY users_own_withdrawals
 ON withdrawals
 FOR SELECT
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS users_own_withdrawals_insert ON withdrawals;
 CREATE POLICY users_own_withdrawals_insert
 ON withdrawals
 FOR INSERT
@@ -188,6 +195,7 @@ END;
 $$;
 
 CREATE EXTENSION IF NOT EXISTS pg_cron;
+SELECT cron.unschedule('process-investments');
 SELECT cron.schedule('process-investments', '*/5 * * * *', 'SELECT process_mature_investments()');
 
 CREATE OR REPLACE FUNCTION request_deposit(amount NUMERIC, tx_hash TEXT, chain TEXT)
