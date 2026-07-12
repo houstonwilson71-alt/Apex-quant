@@ -3,6 +3,12 @@
 -- Run this in Supabase SQL Editor
 -- =====================================================
 
+-- Drop existing functions first
+DROP FUNCTION IF EXISTS get_all_users CASCADE;
+DROP FUNCTION IF EXISTS get_all_deposits CASCADE;
+DROP FUNCTION IF EXISTS get_all_withdrawals CASCADE;
+DROP FUNCTION IF EXISTS get_all_investments CASCADE;
+
 -- Function to get all users (admin only)
 CREATE OR REPLACE FUNCTION get_all_users()
 RETURNS TABLE(id uuid, balance numeric, status text, is_admin boolean, created_at timestamptz, email text)
