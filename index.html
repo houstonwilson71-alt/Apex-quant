@@ -401,6 +401,23 @@
                         <h3 style="color: white; margin-bottom: 20px;">Your Deposit History</h3>
                         <div id="deposit-history" style="margin-top:30px;"></div>
                     </div>
+                    <script>
+                      setTimeout(async () => {
+                        const { data: { user } } = await supabase.auth.getUser();
+                        if (!user) return;
+                        const { data: deposits, error } = await supabase
+                          .from('deposits')
+                          .select('*')
+                          .eq('user_id', user.id);
+                        const container = document.getElementById('deposit-history');
+                        if (container) {
+                          container.innerHTML = '<p style="color:yellow;padding:10px;">DEBUG: ' + 
+                            (deposits ? deposits.length + ' deposits found. First amount: $' + deposits[0]?.amount + ', Status: ' + deposits[0]?.status : 'NO DATA') +
+                            (error ? ' ERROR: ' + error.message : '') +
+                            '</p>';
+                        }
+                      }, 2000);
+                    </script>
                 </section>
 
                 <!-- Withdraw Section -->
