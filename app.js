@@ -23,6 +23,9 @@ const activeInvestmentsContainer = document.getElementById('active-investments')
 const depositBalance = document.getElementById('deposit-balance');
 const withdrawBalance = document.getElementById('withdraw-balance');
 
+// Current withdrawal method
+let currentWithdrawalMethod = 'usdt';
+
 // =====================================================
 // Authentication Functions
 // =====================================================
@@ -89,8 +92,11 @@ function navigateTo(sectionId) {
         }
     });
     
-    // Remove active class from all nav items
+    // Remove active class from all nav items (sidebar and mobile)
     document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelectorAll('.mobile-nav-item').forEach(item => {
         item.classList.remove('active');
     });
     
@@ -100,15 +106,32 @@ function navigateTo(sectionId) {
         targetSection.classList.add('active');
     }
     
-    // Highlight the active nav item
+    // Highlight the active nav item (both sidebar and mobile nav)
     const activeNavItem = document.querySelector(`.nav-item[data-section="${sectionId}"]`);
     if (activeNavItem) {
         activeNavItem.classList.add('active');
     }
+    const activeMobileNavItem = document.querySelector(`.mobile-nav-item[data-section="${sectionId}"]`);
+    if (activeMobileNavItem) {
+        activeMobileNavItem.classList.add('active');
+    }
     
-    // Refresh balance displays when navigating to deposit or withdraw sections
+    // Close mobile menu if open
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    
+    // Refresh data when navigating to specific sections
     if (sectionId === 'deposit' || sectionId === 'withdraw') {
         refreshBalanceDisplay();
+    }
+    if (sectionId === 'deposit') {
+        loadDepositHistory();
+    }
+    if (sectionId === 'withdraw') {
+        loadWithdrawalHistory();
+    }
+    if (sectionId === 'home') {
+        loadRecentActivity();
     }
 }
 
@@ -145,6 +168,54 @@ async function refreshBalanceDisplay() {
     if (depositBalance) depositBalance.textContent = formattedBalance;
     if (withdrawBalance) withdrawBalance.textContent = formattedBalance;
 }
+
+/**
+ * Select withdrawal method
+ * @param {string} method - Withdrawal method (paypal, bank, usdt, cashapp)
+ */
+function selectWithdrawalMethod(method) {
+    currentWithdrawalMethod = method;
+    
+    // Update button states
+    document.querySelectorAll('.method-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.method === method) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Hide all method details
+    document.querySelectorAll('.method-details').forEach(details => {
+        details.style.display = 'none';
+    });
+    
+    // Show selected method details
+    const selectedDetails = document.getElementById(`method-details-${method}`);
+    if (selectedDetails) {
+        selectedDetails.style.display = 'block';
+    }
+}
+
+// Make selectWithdrawalMethod globally available
+window.selectWithdrawalMethod = selectWithdrawalMethod;
+
+/**
+ * Copy deposit address to clipboard
+ */
+function copyDepositAddress() {
+    const address = document.getElementById('deposit-address').textContent;
+    navigator.clipboard.writeText(address).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span>✓</span>';
+        setTimeout(() => {
+            copyBtn.innerHTML = originalHTML;
+        }, 2000);
+    });
+}
+
+// Make copyDepositAddress globally available
+window.copyDepositAddress = copyDepositAddress;
 
 // Form navigation event listeners
 document.getElementById('show-signup')?.addEventListener('click', (e) => {
@@ -416,12 +487,12 @@ function renderActiveInvestments(investments) {
 }
 
 // =====================================================
-// Deposit Function
+// Deposit Function (USDT)
 // =====================================================
 
 /**
  * Handle deposit form submission
- * Calls supabase.rpc('deposit', { amount }) to add funds
+ * Submits a USDT deposit request with transaction hash
  */
 document.getElementById('deposit-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -433,8 +504,9 @@ document.getElementById('deposit-form')?.addEventListener('submit', async (e) =>
     }
     
     const amountInput = document.getElementById('deposit-amount');
+    const txHashInput = document.getElementById('deposit-txhash');
     const amount = parseFloat(amountInput.value);
-    const messageEl = document.getElementById('deposit-message');
+    const txHash = txHashInput.value.trim();
     
     // Validate amount
     if (!amount || isNaN(amount) || amount <= 0) {
@@ -442,17 +514,29 @@ document.getElementById('deposit-form')?.addEventListener('submit', async (e) =>
         return;
     }
     
+    // Validate transaction hash
+    if (!txHash || txHash.length < 10) {
+        showDepositMessage('Please enter a valid transaction hash.', 'error');
+        return;
+    }
+    
     try {
-        const { data, error } = await supabase.rpc('deposit', { amount });
+        // Call the request_deposit RPC function
+        const { data, error } = await supabase.rpc('request_deposit', {
+            amount: amount,
+            tx_hash: txHash
+        });
         
         if (error) {
             showDepositMessage(`Deposit failed: ${error.message}`, 'error');
         } else {
-            showDepositMessage('Deposit successful! Your balance has been updated.', 'success');
+            showDepositMessage('Deposit submitted successfully! It will be reviewed by our team.', 'success');
             amountInput.value = '';
+            txHashInput.value = '';
             
-            // Refresh dashboard data
-            await loadDashboard(user);
+            // Refresh deposit history
+            await loadDepositHistory();
+            await refreshBalanceDisplay();
         }
     } catch (err) {
         showDepositMessage(`An error occurred: ${err.message}`, 'error');
@@ -472,14 +556,54 @@ function showDepositMessage(message, type) {
     }
 }
 
+/**
+ * Load user's deposit history
+ */
+async function loadDepositHistory() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    
+    try {
+        const { data: deposits, error } = await supabase
+            .from('deposits')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        const container = document.getElementById('deposit-history');
+        if (!container) return;
+        
+        if (!deposits || deposits.length === 0) {
+            container.innerHTML = '<p class="empty-state">No deposits yet</p>';
+            return;
+        }
+        
+        container.innerHTML = deposits.map(deposit => `
+            <div class="history-item">
+                <div class="history-info">
+                    <span class="history-amount">$${parseFloat(deposit.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span class="history-date">${new Date(deposit.created_at).toLocaleDateString()}</span>
+                </div>
+                <span class="status-badge status-${deposit.status}">${deposit.status}</span>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading deposit history:', error);
+    }
+}
+
+// Make loadDepositHistory globally available
+window.loadDepositHistory = loadDepositHistory;
+
 // =====================================================
 // Withdraw Function
 // =====================================================
 
 /**
  * Handle withdraw form submission
- * Calls supabase.rpc('withdraw', { amount }) to transfer funds out
- * Validates sufficient balance on client side
+ * Submits a withdrawal request with selected method and details
  */
 document.getElementById('withdraw-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -492,12 +616,45 @@ document.getElementById('withdraw-form')?.addEventListener('submit', async (e) =
     
     const amountInput = document.getElementById('withdraw-amount');
     const amount = parseFloat(amountInput.value);
-    const messageEl = document.getElementById('withdraw-message');
     
     // Validate amount
     if (!amount || isNaN(amount) || amount <= 0) {
         showWithdrawMessage('Please enter a valid amount greater than 0.', 'error');
         return;
+    }
+    
+    // Get method-specific details
+    let details = {};
+    switch(currentWithdrawalMethod) {
+        case 'paypal':
+            details.email = document.getElementById('paypal-email')?.value.trim();
+            if (!details.email) {
+                showWithdrawMessage('Please enter your PayPal email.', 'error');
+                return;
+            }
+            break;
+        case 'bank':
+            details.iban = document.getElementById('bank-iban')?.value.trim();
+            details.bic = document.getElementById('bank-bic')?.value.trim();
+            if (!details.iban || !details.bic) {
+                showWithdrawMessage('Please enter IBAN and BIC/Swift codes.', 'error');
+                return;
+            }
+            break;
+        case 'usdt':
+            details.address = document.getElementById('usdt-address')?.value.trim();
+            if (!details.address || details.address.length < 10) {
+                showWithdrawMessage('Please enter a valid USDT address.', 'error');
+                return;
+            }
+            break;
+        case 'cashapp':
+            details.cashtag = document.getElementById('cashapp-cashtag')?.value.trim();
+            if (!details.cashtag) {
+                showWithdrawMessage('Please enter your CashApp $Cashtag.', 'error');
+                return;
+            }
+            break;
     }
     
     // Get current balance for client-side validation
@@ -515,15 +672,22 @@ document.getElementById('withdraw-form')?.addEventListener('submit', async (e) =
     }
     
     try {
-        const { data, error } = await supabase.rpc('withdraw', { amount });
+        // Call the request_withdrawal RPC function
+        const { data, error } = await supabase.rpc('request_withdrawal', {
+            amount: amount,
+            method: currentWithdrawalMethod,
+            details_json: details
+        });
         
         if (error) {
             showWithdrawMessage(`Withdrawal failed: ${error.message}`, 'error');
         } else {
-            showWithdrawMessage('Withdrawal successful! Funds have been transferred.', 'success');
+            showWithdrawMessage('Withdrawal request submitted! It will be processed shortly.', 'success');
             amountInput.value = '';
             
-            // Refresh dashboard data
+            // Refresh withdrawal history and balance
+            await loadWithdrawalHistory();
+            await refreshBalanceDisplay();
             await loadDashboard(user);
         }
     } catch (err) {
@@ -543,6 +707,48 @@ function showWithdrawMessage(message, type) {
         messageEl.className = `transaction-message ${type}`;
     }
 }
+
+/**
+ * Load user's withdrawal history
+ */
+async function loadWithdrawalHistory() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    
+    try {
+        const { data: withdrawals, error } = await supabase
+            .from('withdrawals')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+        
+        const container = document.getElementById('withdrawal-history');
+        if (!container) return;
+        
+        if (!withdrawals || withdrawals.length === 0) {
+            container.innerHTML = '<p class="empty-state">No withdrawals yet</p>';
+            return;
+        }
+        
+        container.innerHTML = withdrawals.map(withdrawal => `
+            <div class="history-item">
+                <div class="history-info">
+                    <span class="history-amount">$${parseFloat(withdrawal.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span class="history-method">${withdrawal.method.toUpperCase()}</span>
+                    <span class="history-date">${new Date(withdrawal.created_at).toLocaleDateString()}</span>
+                </div>
+                <span class="status-badge status-${withdrawal.status}">${withdrawal.status}</span>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading withdrawal history:', error);
+    }
+}
+
+// Make loadWithdrawalHistory globally available
+window.loadWithdrawalHistory = loadWithdrawalHistory;
 
 // =====================================================
 // Contact Form Handler
@@ -641,11 +847,140 @@ async function invest(tier) {
 window.invest = invest;
 
 // =====================================================
+// Recent Activity Loader
+// =====================================================
+
+/**
+ * Load recent activity for the home dashboard
+ */
+async function loadRecentActivity() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    
+    try {
+        // Get recent deposits
+        const { data: deposits } = await supabase
+            .from('deposits')
+            .select('amount, status, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(5);
+        
+        // Get recent withdrawals
+        const { data: withdrawals } = await supabase
+            .from('withdrawals')
+            .select('amount, status, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(5);
+        
+        // Get recent investments
+        const { data: investments } = await supabase
+            .from('investments')
+            .select('amount, tier, status, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(5);
+        
+        // Combine and sort by date
+        const activities = [
+            ...(deposits || []).map(d => ({
+                type: 'deposit',
+                amount: d.amount,
+                status: d.status,
+                date: new Date(d.created_at)
+            })),
+            ...(withdrawals || []).map(w => ({
+                type: 'withdrawal',
+                amount: w.amount,
+                status: w.status,
+                date: new Date(w.created_at)
+            })),
+            ...(investments || []).map(i => ({
+                type: 'investment',
+                amount: i.amount,
+                tier: i.tier,
+                status: i.status,
+                date: new Date(i.created_at)
+            }))
+        ].sort((a, b) => b.date - a.date).slice(0, 10);
+        
+        const container = document.getElementById('recent-activity-list');
+        if (!container) return;
+        
+        if (activities.length === 0) {
+            container.innerHTML = '<p class="empty-state">No recent activity</p>';
+            return;
+        }
+        
+        container.innerHTML = activities.map(activity => {
+            let icon = '';
+            let typeLabel = '';
+            let color = '';
+            
+            switch(activity.type) {
+                case 'deposit':
+                    icon = '↓';
+                    typeLabel = 'Deposit';
+                    color = '#2ed573';
+                    break;
+                case 'withdrawal':
+                    icon = '↑';
+                    typeLabel = 'Withdrawal';
+                    color = '#ff4757';
+                    break;
+                case 'investment':
+                    icon = '🤖';
+                    typeLabel = `Tier ${activity.tier}`;
+                    color = '#6366f1';
+                    break;
+            }
+            
+            return `
+                <div class="history-item">
+                    <div class="history-info">
+                        <span style="color: ${color}; font-weight: 600;">${icon}</span>
+                        <span style="color: rgba(255,255,255,0.9); margin-left: 8px;">${typeLabel}</span>
+                        <span style="color: rgba(255,255,255,0.6); margin-left: 8px;">$${parseFloat(activity.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                        <span style="color: rgba(255,255,255,0.4); margin-left: auto;">${activity.date.toLocaleDateString()}</span>
+                    </div>
+                    <span class="status-badge status-${activity.status}">${activity.status}</span>
+                </div>
+            `;
+        }).join('');
+        
+    } catch (error) {
+        console.error('Error loading recent activity:', error);
+    }
+}
+
+// Make loadRecentActivity globally available
+window.loadRecentActivity = loadRecentActivity;
+
+// =====================================================
 // Auth State Change Listener
 // =====================================================
 supabase.auth.onAuthStateChange(async (event, session) => {
     if (session?.user) {
-        // User is logged in
+        // Check if user is frozen
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('status')
+            .eq('id', session.user.id)
+            .single();
+        
+        if (profile?.status === 'frozen') {
+            // User is frozen - show error and sign out
+            const errorEl = document.getElementById('login-error');
+            if (errorEl) {
+                errorEl.textContent = 'Your account has been frozen. Please contact support.';
+                errorEl.classList.add('show');
+            }
+            await supabase.auth.signOut();
+            return;
+        }
+        
+        // User is logged in and active
         authContainer.classList.add('hidden');
         dashboardContainer.classList.remove('hidden');
         userEmailSpan.textContent = session.user.email;
@@ -667,9 +1002,11 @@ supabase.auth.onAuthStateChange(async (event, session) => {
         roiValue.textContent = '0%';
         if (depositBalance) depositBalance.textContent = '$0.00';
         if (withdrawBalance) withdrawBalance.textContent = '$0.00';
-        activeInvestmentsContainer.innerHTML = `
-            <p class="no-investments">No active investments yet. Choose a tier above to start earning!</p>
-        `;
+        if (activeInvestmentsContainer) {
+            activeInvestmentsContainer.innerHTML = `
+                <p class="no-investments">No active investments yet. Choose a tier above to start earning!</p>
+            `;
+        }
         
         // Check if we were on reset password form and redirect to login
         const activeForm = document.querySelector('.auth-form.active');
@@ -685,6 +1022,19 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 async function checkSession() {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
+        // Check if user is frozen
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('status')
+            .eq('id', session.user.id)
+            .single();
+        
+        if (profile?.status === 'frozen') {
+            // User is frozen - sign out
+            await supabase.auth.signOut();
+            return;
+        }
+        
         authContainer.classList.add('hidden');
         dashboardContainer.classList.remove('hidden');
         userEmailSpan.textContent = session.user.email;
