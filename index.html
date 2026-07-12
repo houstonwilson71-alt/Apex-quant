@@ -1,580 +1,397 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Quant - Investment Platform</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apex Quant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <!-- Background gradients for futuristic effect -->
-    <div class="bg-gradient"></div>
-    <div class="bg-gradient bg-gradient-2"></div>
-    <div class="bg-gradient bg-gradient-3"></div>
-    
-    <!-- Animated particles -->
-    <div class="particles-container">
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
-        <div class="particle"></div>
+  <div class="bg-gradient"></div>
+  <div class="bg-gradient bg-gradient-2"></div>
+  <div class="bg-gradient bg-gradient-3"></div>
+
+  <div class="particles-container" aria-hidden="true">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  </div>
+
+  <div class="app-shell">
+    <div id="auth-container" class="auth-wrapper hidden">
+      <div class="glass-card auth-card">
+        <div id="login-form" class="auth-form active">
+          <div class="auth-header">
+            <h1>Welcome Back</h1>
+            <p>Sign in to your Apex Quant account</p>
+          </div>
+          <div id="login-error" class="error-message"></div>
+          <form>
+            <label class="form-group">
+              <span>Email</span>
+              <input id="login-email" type="email" placeholder="you@example.com" required />
+            </label>
+            <label class="form-group">
+              <span>Password</span>
+              <input id="login-password" type="password" placeholder="Enter your password" required />
+            </label>
+            <button type="submit" class="btn btn-primary">Sign In</button>
+          </form>
+          <div class="form-footer">
+            <button id="show-reset-password" class="btn-link" type="button">Forgot password?</button>
+            <p>Don’t have an account? <button id="show-signup" class="btn-link" type="button">Sign up</button></p>
+          </div>
+        </div>
+
+        <div id="signup-form" class="auth-form">
+          <div class="auth-header">
+            <h1>Create Account</h1>
+            <p>Join Apex Quant and start earning</p>
+          </div>
+          <div id="signup-error" class="error-message"></div>
+          <div id="signup-success" class="success-message"></div>
+          <form>
+            <label class="form-group">
+              <span>Email</span>
+              <input id="signup-email" type="email" placeholder="you@example.com" required />
+            </label>
+            <label class="form-group">
+              <span>Password</span>
+              <input id="signup-password" type="password" placeholder="At least 6 characters" required />
+            </label>
+            <label class="form-group">
+              <span>Confirm Password</span>
+              <input id="signup-confirm-password" type="password" placeholder="Confirm your password" required />
+            </label>
+            <button type="submit" class="btn btn-primary">Create Account</button>
+          </form>
+          <div class="form-footer">
+            <p>Already have an account? <button id="show-login" class="btn-link" type="button">Sign in</button></p>
+          </div>
+        </div>
+
+        <div id="reset-password-form" class="auth-form">
+          <div class="auth-header">
+            <h1>Reset Password</h1>
+            <p>We’ll send you a reset link</p>
+          </div>
+          <div id="reset-error" class="error-message"></div>
+          <div id="reset-success" class="success-message"></div>
+          <form>
+            <label class="form-group">
+              <span>Email</span>
+              <input id="reset-email" type="email" placeholder="you@example.com" required />
+            </label>
+            <button type="submit" class="btn btn-primary">Send Reset Link</button>
+          </form>
+          <div class="form-footer">
+            <p>Remember your password? <button id="back-to-login" class="btn-link" type="button">Sign in</button></p>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <div class="app-container">
-        <!-- Auth Container -->
-        <div id="auth-container" class="auth-wrapper hidden">
-            <div class="glass-card auth-card">
-                <!-- Login Form -->
-                <div id="login-form" class="auth-form active">
-                    <div class="auth-header">
-                        <h1>Welcome Back</h1>
-                        <p class="subtitle">Sign in to your Apex Quant account</p>
-                    </div>
 
-                    <div id="login-error" class="error-message"></div>
+    <div id="dashboard-container" class="dashboard-layout hidden">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h2>📊 Apex Quant</h2>
+          <span>Investment Platform</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-item active" data-section="home" onclick="navigateTo('home'); return false;">🏠 Home</a>
+          <a href="#" class="nav-item" data-section="trading-ai" onclick="navigateTo('trading-ai'); return false;">🤖 Trading AI</a>
+          <a href="#" class="nav-item" data-section="deposit" onclick="navigateTo('deposit'); return false;">💰 Deposit</a>
+          <a href="#" class="nav-item" data-section="withdraw" onclick="navigateTo('withdraw'); return false;">💸 Withdraw</a>
+          <a href="#" class="nav-item" data-section="contact" onclick="navigateTo('contact'); return false;">📞 Support</a>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-info" id="sidebar-user-email">User</div>
+          <button id="logout-btn" class="btn btn-logout" type="button">🚪 Sign Out</button>
+        </div>
+        <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" type="button">☰</button>
+      </aside>
 
-                    <form>
-                        <div class="form-group">
-                            <label for="login-email">Email Address</label>
-                            <input type="email" id="login-email" placeholder="you@example.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="login-password">Password</label>
-                            <input type="password" id="login-password" placeholder="Enter your password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Sign In</button>
-                    </form>
-
-                    <div class="form-footer">
-                        <button type="button" id="show-reset-password" class="btn-link">Forgot password?</button>
-                        <p>
-                            Don't have an account? 
-                            <button type="button" id="show-signup" class="btn-link">Sign up</button>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Sign Up Form -->
-                <div id="signup-form" class="auth-form">
-                    <div class="auth-header">
-                        <h1>Create Account</h1>
-                        <p class="subtitle">Join Apex Quant and start earning</p>
-                    </div>
-
-                    <div id="signup-error" class="error-message"></div>
-                    <div id="signup-success" class="success-message"></div>
-
-                    <form>
-                        <div class="form-group">
-                            <label for="signup-email">Email Address</label>
-                            <input type="email" id="signup-email" placeholder="you@example.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-password">Password</label>
-                            <input type="password" id="signup-password" placeholder="At least 6 characters" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="signup-confirm-password">Confirm Password</label>
-                            <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Create Account</button>
-                    </form>
-
-                    <div class="form-footer">
-                        <p>
-                            Already have an account? 
-                            <button type="button" id="show-login" class="btn-link">Sign in</button>
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Reset Password Form -->
-                <div id="reset-password-form" class="auth-form">
-                    <div class="auth-header">
-                        <h1>Reset Password</h1>
-                        <p class="subtitle">We'll send you a reset link</p>
-                    </div>
-
-                    <div id="reset-error" class="error-message"></div>
-                    <div id="reset-success" class="success-message"></div>
-
-                    <form>
-                        <div class="form-group">
-                            <label for="reset-email">Email Address</label>
-                            <input type="email" id="reset-email" placeholder="you@example.com" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Send Reset Link</button>
-                    </form>
-
-                    <div class="form-footer">
-                        <p>
-                            Remember your password? 
-                            <button type="button" id="back-to-login" class="btn-link">Sign in</button>
-                        </p>
-                    </div>
-                </div>
+      <main class="main-content">
+        <section id="section-home" class="dashboard-section active">
+          <div class="section-header">
+            <h1>Dashboard Overview</h1>
+            <p class="subtitle">Welcome back, <span id="user-email">User</span></p>
+          </div>
+          <div class="stats-grid">
+            <div class="glass-card stat-card">
+              <div class="stat-icon">💰</div>
+              <div class="stat-label">Account Balance</div>
+              <div class="stat-value" id="balance-value">$0.00</div>
             </div>
-        </div>
+            <div class="glass-card stat-card">
+              <div class="stat-icon">📈</div>
+              <div class="stat-label">Total Profit</div>
+              <div class="stat-value profit" id="profit-value">$0.00</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-icon">🎯</div>
+              <div class="stat-label">Overall ROI</div>
+              <div class="stat-value roi" id="roi-value">0%</div>
+            </div>
+          </div>
 
-        <!-- Dashboard Container -->
-        <div id="dashboard-container" class="dashboard-layout hidden">
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <div class="sidebar-header">
-                    <h2>📊 Apex Quant</h2>
-                    <span class="sidebar-subtitle">Investment Platform</span>
+          <div class="quick-actions">
+            <div class="glass-card quick-action-card" onclick="navigateTo('deposit')">
+              <span class="qa-icon">💰</span><span class="qa-text">Deposit Funds</span>
+            </div>
+            <div class="glass-card quick-action-card" onclick="navigateTo('withdraw')">
+              <span class="qa-icon">💸</span><span class="qa-text">Withdraw Funds</span>
+            </div>
+            <div class="glass-card quick-action-card" onclick="navigateTo('trading-ai')">
+              <span class="qa-icon">🤖</span><span class="qa-text">Start Investing</span>
+            </div>
+          </div>
+
+          <div class="glass-card activity-card">
+            <h3>Recent Activity</h3>
+            <div id="recent-activity-list"><p class="empty-state">No recent activity</p></div>
+          </div>
+        </section>
+
+        <section id="section-trading-ai" class="dashboard-section">
+          <div class="section-header">
+            <h1>Trading AI</h1>
+            <p class="subtitle">Invest in our AI-powered trading tiers and earn guaranteed returns</p>
+          </div>
+          <div class="section-title">Investment Tiers</div>
+          <p class="section-subtitle">Choose a tier and start earning guaranteed returns in 14 days!</p>
+
+          <div class="tiers-grid">
+            <div class="glass-card tier-card tier-1">
+              <div class="tier-badge">Tier 1</div>
+              <div class="tier-roi">100%</div>
+              <div class="tier-roi-label">ROI</div>
+              <div class="tier-range">$100 - $499</div>
+              <div class="tier-term">14 days term</div>
+              <div class="tier-input-group">
+                <input type="number" id="amount-tier-1" placeholder="Amount ($)" min="100" max="499" />
+                <button type="button" class="btn btn-primary" onclick="invest(1)">Invest</button>
+              </div>
+            </div>
+
+            <div class="glass-card tier-card tier-2">
+              <div class="tier-badge">Tier 2</div>
+              <div class="tier-roi">150%</div>
+              <div class="tier-roi-label">ROI</div>
+              <div class="tier-range">$500 - $3,999</div>
+              <div class="tier-term">14 days term</div>
+              <div class="tier-input-group">
+                <input type="number" id="amount-tier-2" placeholder="Amount ($)" min="500" max="3999" />
+                <button type="button" class="btn btn-primary" onclick="invest(2)">Invest</button>
+              </div>
+            </div>
+
+            <div class="glass-card tier-card tier-3">
+              <div class="tier-badge">Tier 3</div>
+              <div class="tier-roi">200%</div>
+              <div class="tier-roi-label">ROI</div>
+              <div class="tier-range">$4,000 - $9,999</div>
+              <div class="tier-term">14 days term</div>
+              <div class="tier-input-group">
+                <input type="number" id="amount-tier-3" placeholder="Amount ($)" min="4000" max="9999" />
+                <button type="button" class="btn btn-primary" onclick="invest(3)">Invest</button>
+              </div>
+            </div>
+
+            <div class="glass-card tier-card tier-4">
+              <div class="tier-badge">VIP</div>
+              <div class="tier-roi">300%</div>
+              <div class="tier-roi-label">ROI</div>
+              <div class="tier-range">$10,000+</div>
+              <div class="tier-term">14 days term</div>
+              <div class="tier-input-group">
+                <input type="number" id="amount-tier-4" placeholder="Amount ($)" min="10000" />
+                <button type="button" class="btn btn-primary" onclick="invest(4)">Invest</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title" style="margin-top: 48px;">Active Investments</div>
+          <div id="active-investments" class="glass-card investments-list">
+            <p class="no-investments">No active investments yet. Choose a tier above to start earning!</p>
+          </div>
+        </section>
+
+        <section id="section-deposit" class="dashboard-section">
+          <div class="section-header">
+            <h1>Deposit USDT</h1>
+            <p class="subtitle">Select a network and send USDT to fund your account</p>
+          </div>
+          <div class="deposit-container">
+            <div class="glass-card deposit-wallet-card">
+              <div class="wallet-header">
+                <img src="https://assets.coingecko.com/coins/images/325/small/Tether.png" alt="USDT" class="usdt-logo" />
+                <span class="wallet-title">USDT Deposit</span>
+              </div>
+              <div class="network-tabs">
+                <div class="network-tab active" data-network="bsc" onclick="selectNetwork('bsc')">
+                  <span class="network-tab-icon">🔗</span><span class="network-tab-name">BSC</span><span class="network-tab-chain">BEP-20</span>
                 </div>
-                
-                <nav class="sidebar-nav">
-                    <a href="#" class="nav-item active" data-section="home" onclick="navigateTo('home'); return false;">
-                        <span class="nav-icon">🏠</span>
-                        <span class="nav-text">Home</span>
-                    </a>
-                    <a href="#" class="nav-item" data-section="trading-ai" onclick="navigateTo('trading-ai'); return false;">
-                        <span class="nav-icon">🤖</span>
-                        <span class="nav-text">Trading AI</span>
-                    </a>
-                    <a href="#" class="nav-item" data-section="deposit" onclick="navigateTo('deposit'); return false;">
-                        <span class="nav-icon">💰</span>
-                        <span class="nav-text">Deposit</span>
-                    </a>
-                    <a href="#" class="nav-item" data-section="withdraw" onclick="navigateTo('withdraw'); return false;">
-                        <span class="nav-icon">💸</span>
-                        <span class="nav-text">Withdraw</span>
-                    </a>
-                    <a href="#" class="nav-item" data-section="contact" onclick="navigateTo('contact'); return false;">
-                        <span class="nav-icon">📞</span>
-                        <span class="nav-text">Support</span>
-                    </a>
-                </nav>
-
-                <div class="sidebar-footer">
-                    <div class="user-info">
-                        <span class="user-email" id="sidebar-user-email">User</span>
-                    </div>
-                    <button id="logout-btn" class="btn btn-logout">
-                        <span>🚪</span> Sign Out
-                    </button>
+                <div class="network-tab" data-network="tron" onclick="selectNetwork('tron')">
+                  <span class="network-tab-icon">🔶</span><span class="network-tab-name">Tron</span><span class="network-tab-chain">TRC-20</span>
                 </div>
+              </div>
 
-                <!-- Mobile menu toggle -->
-                <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">
-                    <span>☰</span>
-                </button>
-            </aside>
+              <div id="network-bsc" class="network-info">
+                <div class="qr-container">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0xbe438a2c7fe9bb534a8b8d06c96e42e9b6620812" alt="BSC QR Code" class="qr-code" />
+                </div>
+                <div class="wallet-address-container">
+                  <label class="wallet-label">BSC (BEP-20) Address</label>
+                  <div class="wallet-address-box">
+                    <code id="deposit-address-bsc">0xbe438a2c7fe9bb534a8b8d06c96e42e9b6620812</code>
+                    <button class="copy-btn" onclick="copyDepositAddress('bsc')" type="button" title="Copy address">📋</button>
+                  </div>
+                </div>
+              </div>
 
-            <!-- Main Content Area -->
-            <main class="main-content">
-                <!-- Home Section -->
-                <section id="section-home" class="dashboard-section active">
-                    <div class="section-header">
-                        <h1>Dashboard Overview</h1>
-                        <p class="subtitle">Welcome back, <span id="user-email">User</span></p>
-                    </div>
+              <div id="network-tron" class="network-info" style="display:none;">
+                <div class="qr-container">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TEmM5aKQTcwQSdnZMGXMeEJMHB6Ko7noqJ" alt="TRON QR Code" class="qr-code" />
+                </div>
+                <div class="wallet-address-container">
+                  <label class="wallet-label">Tron (TRC-20) Address</label>
+                  <div class="wallet-address-box">
+                    <code id="deposit-address-tron">TEmM5aKQTcwQSdnZMGXMeEJMHB6Ko7noqJ</code>
+                    <button class="copy-btn" onclick="copyDepositAddress('tron')" type="button" title="Copy address">📋</button>
+                  </div>
+                </div>
+              </div>
 
-                    <!-- Stats Cards -->
-                    <div class="stats-grid">
-                        <div class="glass-card stat-card">
-                            <div class="stat-icon">💰</div>
-                            <div class="stat-label">Account Balance</div>
-                            <div class="stat-value" id="balance-value">$0.00</div>
-                        </div>
-                        <div class="glass-card stat-card">
-                            <div class="stat-icon">📈</div>
-                            <div class="stat-label">Total Profit</div>
-                            <div class="stat-value profit" id="profit-value">$0.00</div>
-                        </div>
-                        <div class="glass-card stat-card">
-                            <div class="stat-icon">🎯</div>
-                            <div class="stat-label">Overall ROI</div>
-                            <div class="stat-value roi" id="roi-value">0%</div>
-                        </div>
-                    </div>
+              <div class="wallet-notice">
+                <span>⚠️</span> Send only USDT on the selected network. Other tokens may be lost.
+              </div>
+            </div>
 
-                    <!-- Quick Actions -->
-                    <div class="quick-actions">
-                        <div class="glass-card quick-action-card" onclick="navigateTo('deposit')">
-                            <span class="qa-icon">💰</span>
-                            <span class="qa-text">Deposit Funds</span>
-                        </div>
-                        <div class="glass-card quick-action-card" onclick="navigateTo('withdraw')">
-                            <span class="qa-icon">💸</span>
-                            <span class="qa-text">Withdraw Funds</span>
-                        </div>
-                        <div class="glass-card quick-action-card" onclick="navigateTo('trading-ai')">
-                            <span class="qa-icon">🤖</span>
-                            <span class="qa-text">Start Investing</span>
-                        </div>
-                    </div>
+            <div class="glass-card deposit-form-card">
+              <h3>Submit Deposit</h3>
+              <p class="form-description">After sending USDT, enter the transaction hash to confirm your deposit.</p>
+              <form id="deposit-form">
+                <input type="hidden" id="selected-network" value="bsc" />
+                <label class="form-group">
+                  <span>Amount Deposited (USD)</span>
+                  <input id="deposit-amount" type="number" placeholder="Enter amount" min="1" step="0.01" required />
+                </label>
+                <label class="form-group">
+                  <span>Transaction Hash</span>
+                  <input id="deposit-txhash" type="text" placeholder="e.g. 0x1234... or TX_HASH" required />
+                </label>
+                <button type="submit" class="btn btn-primary">Submit Deposit</button>
+              </form>
+              <div id="deposit-message" class="transaction-message"></div>
+            </div>
+          </div>
 
-                    <!-- Recent Activity -->
-                    <div class="glass-card" style="margin-top: 32px; padding: 24px;">
-                        <h3 style="color: white; margin-bottom: 20px;">Recent Activity</h3>
-                        <div id="recent-activity-list">
-                            <p class="empty-state">No recent activity</p>
-                        </div>
-                    </div>
-                </section>
+          <div class="glass-card history-card">
+            <h3>Your Deposit History</h3>
+            <div id="deposit-history"></div>
+          </div>
+        </section>
 
-                <!-- Trading AI Section -->
-                <section id="section-trading-ai" class="dashboard-section">
-                    <div class="section-header">
-                        <h1>Trading AI</h1>
-                        <p class="subtitle">Invest in our AI-powered trading tiers and earn guaranteed returns</p>
-                    </div>
+        <section id="section-withdraw" class="dashboard-section">
+          <div class="section-header">
+            <h1>Withdraw Funds</h1>
+            <p class="subtitle">Transfer your earnings to your preferred payment method</p>
+          </div>
 
-                    <!-- Investment Tiers -->
-                    <div class="section-title">Investment Tiers</div>
-                    <p class="section-subtitle">Choose a tier and start earning guaranteed returns in 14 days!</p>
-                    
-                    <div class="tiers-grid">
-                        <!-- Tier 1 -->
-                        <div class="glass-card tier-card tier-1">
-                            <div class="tier-badge">Tier 1</div>
-                            <div class="tier-roi">100%</div>
-                            <div class="tier-roi-label">ROI</div>
-                            <div class="tier-range">$100 - $499</div>
-                            <div class="tier-term">14 days term</div>
-                            <div class="tier-input-group">
-                                <input type="number" id="amount-tier-1" placeholder="Amount ($)" min="100" max="499">
-                                <button class="btn btn-primary" onclick="invest(1)">Invest</button>
-                            </div>
-                        </div>
+          <div class="glass-card withdraw-card">
+            <div class="withdraw-balance-display">
+              <span class="balance-label">Available Balance</span>
+              <span class="balance-amount" id="withdraw-balance">$0.00</span>
+            </div>
 
-                        <!-- Tier 2 -->
-                        <div class="glass-card tier-card tier-2">
-                            <div class="tier-badge">Tier 2</div>
-                            <div class="tier-roi">150%</div>
-                            <div class="tier-roi-label">ROI</div>
-                            <div class="tier-range">$500 - $3,999</div>
-                            <div class="tier-term">14 days term</div>
-                            <div class="tier-input-group">
-                                <input type="number" id="amount-tier-2" placeholder="Amount ($)" min="500" max="3999">
-                                <button class="btn btn-primary" onclick="invest(2)">Invest</button>
-                            </div>
-                        </div>
+            <div class="method-selection">
+              <label class="method-label">Select Withdrawal Method</label>
+              <div class="method-buttons">
+                <button type="button" class="method-btn" data-method="paypal" onclick="selectWithdrawalMethod('paypal')">PayPal</button>
+                <button type="button" class="method-btn" data-method="bank" onclick="selectWithdrawalMethod('bank')">Bank</button>
+                <button type="button" class="method-btn active" data-method="usdt" onclick="selectWithdrawalMethod('usdt')">USDT</button>
+                <button type="button" class="method-btn" data-method="cashapp" onclick="selectWithdrawalMethod('cashapp')">CashApp</button>
+              </div>
+            </div>
 
-                        <!-- Tier 3 -->
-                        <div class="glass-card tier-card tier-3">
-                            <div class="tier-badge">Tier 3</div>
-                            <div class="tier-roi">200%</div>
-                            <div class="tier-roi-label">ROI</div>
-                            <div class="tier-range">$4,000 - $9,999</div>
-                            <div class="tier-term">14 days term</div>
-                            <div class="tier-input-group">
-                                <input type="number" id="amount-tier-3" placeholder="Amount ($)" min="4000" max="9999">
-                                <button class="btn btn-primary" onclick="invest(3)">Invest</button>
-                            </div>
-                        </div>
+            <form id="withdraw-form" class="withdraw-form">
+              <div id="method-details-paypal" class="method-details" style="display:none;">
+                <label class="form-group">
+                  <span>PayPal Email</span>
+                  <input id="paypal-email" type="email" placeholder="your@email.com" />
+                </label>
+              </div>
+              <div id="method-details-bank" class="method-details" style="display:none;">
+                <label class="form-group">
+                  <span>IBAN</span>
+                  <input id="bank-iban" type="text" placeholder="GB82WEST12345698765432" />
+                </label>
+                <label class="form-group">
+                  <span>BIC / Swift</span>
+                  <input id="bank-bic" type="text" placeholder="WESTGB2L" />
+                </label>
+              </div>
+              <div id="method-details-usdt" class="method-details">
+                <label class="form-group">
+                  <span>USDT (BEP-20) Address</span>
+                  <input id="usdt-address" type="text" placeholder="0x..." />
+                </label>
+              </div>
+              <div id="method-details-cashapp" class="method-details" style="display:none;">
+                <label class="form-group">
+                  <span>CashApp $Cashtag</span>
+                  <input id="cashapp-cashtag" type="text" placeholder="$yourname" />
+                </label>
+              </div>
 
-                        <!-- Tier 4 -->
-                        <div class="glass-card tier-card tier-4">
-                            <div class="tier-badge">VIP</div>
-                            <div class="tier-roi">300%</div>
-                            <div class="tier-roi-label">ROI</div>
-                            <div class="tier-range">$10,000+</div>
-                            <div class="tier-term">14 days term</div>
-                            <div class="tier-input-group">
-                                <input type="number" id="amount-tier-4" placeholder="Amount ($)" min="10000">
-                                <button class="btn btn-primary" onclick="invest(4)">Invest</button>
-                            </div>
-                        </div>
-                    </div>
+              <label class="form-group">
+                <span>Amount to Withdraw (USD)</span>
+                <input id="withdraw-amount" type="number" placeholder="Enter amount" min="1" step="0.01" required />
+              </label>
+              <button type="submit" class="btn btn-primary">Submit Withdrawal Request</button>
+            </form>
+            <div id="withdraw-message" class="transaction-message"></div>
+          </div>
 
-                    <!-- Active Investments -->
-                    <div class="section-title" style="margin-top: 48px;">Active Investments</div>
-                    <div id="active-investments" class="glass-card investments-list">
-                        <p class="no-investments">No active investments yet. Choose a tier above to start earning!</p>
-                    </div>
-                </section>
+          <div class="glass-card history-card">
+            <h3>Your Withdrawal History</h3>
+            <div id="withdrawal-history"></div>
+          </div>
+        </section>
 
-                <!-- Deposit Section (USDT) -->
-                <section id="section-deposit" class="dashboard-section">
-                    <div class="section-header">
-                        <h1>Deposit USDT</h1>
-                        <p class="subtitle">Select a network and send USDT to fund your account</p>
-                    </div>
-
-                    <div class="deposit-container">
-                        <!-- Wallet Address Card -->
-                        <div class="glass-card deposit-wallet-card">
-                            <div class="wallet-header">
-                                <img src="https://assets.coingecko.com/coins/images/325/small/Tether.png" alt="USDT" class="usdt-logo">
-                                <span class="wallet-title">USDT Deposit</span>
-                            </div>
-                            
-                            <!-- Network Selection Tabs -->
-                            <div class="network-tabs">
-                                <div class="network-tab active" data-network="bsc" onclick="selectNetwork('bsc')">
-                                    <span class="network-tab-icon">🔗</span>
-                                    <span class="network-tab-name">BSC</span>
-                                    <span class="network-tab-chain">BEP-20</span>
-                                </div>
-                                <div class="network-tab" data-network="tron" onclick="selectNetwork('tron')">
-                                    <span class="network-tab-icon">🔶</span>
-                                    <span class="network-tab-name">Tron</span>
-                                    <span class="network-tab-chain">TRC-20</span>
-                                </div>
-                            </div>
-                            
-                            <!-- BSC Info -->
-                            <div id="network-bsc" class="network-info">
-                                <div class="qr-container">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=0xbe438a2c7fe9bb534a8b8d06c96e42e9b6620812" alt="BSC QR Code" class="qr-code">
-                                </div>
-                                
-                                <div class="wallet-address-container">
-                                    <label class="wallet-label">BSC (BEP-20) Address</label>
-                                    <div class="wallet-address-box">
-                                        <code id="deposit-address-bsc">0xbe438a2c7fe9bb534a8b8d06c96e42e9b6620812</code>
-                                        <button class="copy-btn" onclick="copyDepositAddress('bsc')" title="Copy address">
-                                            <span>📋</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Tron Info -->
-                            <div id="network-tron" class="network-info" style="display: none;">
-                                <div class="qr-container">
-                                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TEmM5aKQTcwQSdnZMGXMeEJMHB6Ko7noqJ" alt="TRON QR Code" class="qr-code">
-                                </div>
-                                
-                                <div class="wallet-address-container">
-                                    <label class="wallet-label">Tron (TRC-20) Address</label>
-                                    <div class="wallet-address-box">
-                                        <code id="deposit-address-tron">TEmM5aKQTcwQSdnZMGXMeEJMHB6Ko7noqJ</code>
-                                        <button class="copy-btn" onclick="copyDepositAddress('tron')" title="Copy address">
-                                            <span>📋</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="wallet-notice">
-                                <span class="notice-icon">⚠️</span>
-                                <span>Send only USDT on the selected network. Other tokens may be lost.</span>
-                            </div>
-                        </div>
-
-                        <!-- Deposit Form Card -->
-                        <div class="glass-card deposit-form-card">
-                            <h3>Submit Deposit</h3>
-                            <p class="form-description">After sending USDT, enter the transaction hash to confirm your deposit.</p>
-                            
-                            <form id="deposit-form">
-                                <input type="hidden" id="selected-network" value="bsc">
-                                
-                                <div class="form-group">
-                                    <label for="deposit-amount">Amount Deposited (USD)</label>
-                                    <input type="number" id="deposit-amount" placeholder="Enter amount" min="1" step="0.01" required>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="deposit-txhash">Transaction Hash (TX Hash)</label>
-                                    <input type="text" id="deposit-txhash" placeholder="e.g. 0x1234... or TX_HASH" required>
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary btn-deposit">Submit Deposit</button>
-                            </form>
-                            
-                            <div id="deposit-message" class="transaction-message"></div>
-                        </div>
-                    </div>
-
-                    <!-- Deposit History -->
-                    <div class="glass-card" style="margin-top: 32px; padding: 24px;">
-                        <h3 style="color: white; margin-bottom: 20px;">Your Deposit History</h3>
-                        <div id="deposit-history" style="margin-top:30px;"></div>
-                    </div>
-                </section>
-
-                <!-- Withdraw Section -->
-                <section id="section-withdraw" class="dashboard-section">
-                    <div class="section-header">
-                        <h1>Withdraw Funds</h1>
-                        <p class="subtitle">Transfer your earnings to your preferred payment method</p>
-                    </div>
-
-                    <div class="glass-card withdraw-card">
-                        <!-- Current Balance -->
-                        <div class="withdraw-balance-display">
-                            <span class="balance-label">Available Balance</span>
-                            <span class="balance-amount" id="withdraw-balance">$0.00</span>
-                        </div>
-
-                        <!-- Method Selection -->
-                        <div class="method-selection">
-                            <label class="method-label">Select Withdrawal Method</label>
-                            <div class="method-buttons">
-                                <button type="button" class="method-btn" data-method="paypal" onclick="selectWithdrawalMethod('paypal')">
-                                    <svg class="method-icon" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.77.77 0 0 1 .757-.661h6.828c2.235 0 3.955.48 5.113 1.428.521.427.905 1.004 1.148 1.727.142.423.214.873.214 1.346 0 .246-.013.489-.038.73a5.72 5.72 0 0 1-.22.991c-.073.21-.18.412-.318.603a3.2 3.2 0 0 1-.483.507c-.184.155-.388.29-.606.402.387.114.754.274 1.092.476.57.34 1.02.79 1.328 1.33.308.54.465 1.17.465 1.882 0 .76-.17 1.448-.505 2.054-.336.607-.822 1.12-1.444 1.526-.623.406-1.37.71-2.22.904-.85.194-1.79.292-2.79.292H8.74l-.696 1.954H7.076v.002z"/>
-                                    </svg>
-                                    <span>PayPal</span>
-                                </button>
-                                <button type="button" class="method-btn" data-method="bank" onclick="selectWithdrawalMethod('bank')">
-                                    <svg class="method-icon" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M4 10h3v7H4v-7zm6.5 0h3v7h-3v-7zm6.5 0h3v7h-3v-7zM2 19h20v3H2v-3zm1-1h18V9H3v9zm2-7h3V5H5v6zm2 0h3V5H7v6z"/>
-                                    </svg>
-                                    <span>Bank</span>
-                                </button>
-                                <button type="button" class="method-btn active" data-method="usdt" onclick="selectWithdrawalMethod('usdt')">
-                                    <svg class="method-icon" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.31-8.86c-1.77-.45-2.34-.94-2.34-1.67 0-.84.79-1.43 2.1-1.43 1.38 0 1.9.66 1.94 1.64h1.71c-.05-1.34-.87-2.57-2.49-2.97V5H10.9v1.69c-1.51.32-2.72 1.3-2.72 2.81 0 1.79 1.49 2.69 3.66 3.21 1.95.46 2.34 1.15 2.34 1.87 0 .53-.39 1.39-2.1 1.39-1.6 0-2.23-.72-2.32-1.64H8.04c.1 1.7 1.36 2.66 2.86 2.97V19h2.34v-1.67c1.52-.29 2.72-1.16 2.73-2.77-.01-2.2-1.9-2.96-3.66-3.42z"/>
-                                    </svg>
-                                    <span>USDT</span>
-                                </button>
-                                <button type="button" class="method-btn" data-method="cashapp" onclick="selectWithdrawalMethod('cashapp')">
-                                    <svg class="method-icon" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
-                                    </svg>
-                                    <span>CashApp</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Method Details Forms -->
-                        <form id="withdraw-form" class="withdraw-form">
-                            <div id="method-details-paypal" class="method-details">
-                                <div class="form-group">
-                                    <label for="paypal-email">PayPal Email</label>
-                                    <input type="email" id="paypal-email" placeholder="your@email.com">
-                                </div>
-                            </div>
-                            
-                            <div id="method-details-bank" class="method-details" style="display: none;">
-                                <div class="form-group">
-                                    <label for="bank-iban">IBAN</label>
-                                    <input type="text" id="bank-iban" placeholder="GB82WEST12345698765432">
-                                </div>
-                                <div class="form-group">
-                                    <label for="bank-bic">BIC / Swift</label>
-                                    <input type="text" id="bank-bic" placeholder="WESTGB2L">
-                                </div>
-                            </div>
-                            
-                            <div id="method-details-usdt" class="method-details">
-                                <div class="form-group">
-                                    <label for="usdt-address">USDT (BEP-20) Address</label>
-                                    <input type="text" id="usdt-address" placeholder="0x...">
-                                </div>
-                            </div>
-                            
-                            <div id="method-details-cashapp" class="method-details" style="display: none;">
-                                <div class="form-group">
-                                    <label for="cashapp-cashtag">CashApp $Cashtag</label>
-                                    <input type="text" id="cashapp-cashtag" placeholder="$yourname">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="withdraw-amount">Amount to Withdraw (USD)</label>
-                                <input type="number" id="withdraw-amount" placeholder="Enter amount" min="1" step="0.01" required>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary btn-withdraw">Submit Withdrawal Request</button>
-                        </form>
-
-                        <div id="withdraw-message" class="transaction-message"></div>
-                    </div>
-
-                    <!-- Withdrawal History -->
-                    <div class="glass-card" style="margin-top: 32px; padding: 24px;">
-                        <h3 style="color: white; margin-bottom: 20px;">Your Withdrawal History</h3>
-                        <div id="withdrawal-history" style="margin-top:30px;"></div>
-                    </div>
-                </section>
-
-                <!-- Contact Support Section -->
-                <section id="section-contact" class="dashboard-section">
-                    <div class="section-header">
-                        <h1>Contact Support</h1>
-                        <p class="subtitle">We're here to help. Send us a message and we'll get back to you.</p>
-                    </div>
-
-                    <div class="glass-card contact-card">
-                        <!-- Formspree Form Integration -->
-                        <form 
-                            id="contact-form" 
-                            class="formspree-form"
-                            action="https://formspree.io/f/mpqvabgw" 
-                            method="POST"
-                        >
-                            <div class="form-group">
-                                <label for="contact-name">Your Name</label>
-                                <input type="text" id="contact-name" name="name" placeholder="John Doe" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="contact-email">Email Address</label>
-                                <input type="email" id="contact-email" name="email" placeholder="you@example.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="contact-message">Message</label>
-                                <textarea id="contact-message" name="message" rows="5" placeholder="How can we help you?" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Send Message</button>
-                            
-                            <!-- Success/Error Messages -->
-                            <div id="contact-form-success" class="success-message" style="display: none; margin-top: 16px;">
-                                Message sent! We'll get back to you shortly.
-                            </div>
-                            <div id="contact-form-error" class="error-message" style="display: none; margin-top: 16px;">
-                                Failed to send message. Please try again or email us directly.
-                            </div>
-                        </form>
-                        
-                        <!-- Direct Email Contact -->
-                        <div class="contact-email-direct">
-                            <p>Prefer email? Contact us directly at:</p>
-                            <a href="mailto:apexquant.support@proton.me" class="contact-email-link">
-                                apexquant.support@proton.me
-                            </a>
-                        </div>
-                    </div>
-                </section>
-            </main>
-
-            <!-- Mobile Bottom Navigation -->
-            <nav class="mobile-bottom-nav">
-                <a href="#" class="mobile-nav-item active" data-section="home" onclick="navigateTo('home'); return false;">
-                    <span class="mobile-nav-icon">🏠</span>
-                    <span class="mobile-nav-text">Home</span>
-                </a>
-                <a href="#" class="mobile-nav-item" data-section="trading-ai" onclick="navigateTo('trading-ai'); return false;">
-                    <span class="mobile-nav-icon">🤖</span>
-                    <span class="mobile-nav-text">Invest</span>
-                </a>
-                <a href="#" class="mobile-nav-item" data-section="deposit" onclick="navigateTo('deposit'); return false;">
-                    <span class="mobile-nav-icon">💰</span>
-                    <span class="mobile-nav-text">Deposit</span>
-                </a>
-                <a href="#" class="mobile-nav-item" data-section="withdraw" onclick="navigateTo('withdraw'); return false;">
-                    <span class="mobile-nav-icon">💸</span>
-                    <span class="mobile-nav-text">Withdraw</span>
-                </a>
-                <a href="#" class="mobile-nav-item" data-section="contact" onclick="navigateTo('contact'); return false;">
-                    <span class="mobile-nav-icon">📞</span>
-                    <span class="mobile-nav-text">Support</span>
-                </a>
-            </nav>
-        </div>
+        <section id="section-contact" class="dashboard-section">
+          <div class="section-header">
+            <h1>Contact Support</h1>
+            <p class="subtitle">We’re here to help. Send us a message and we’ll get back to you.</p>
+          </div>
+          <div class="glass-card contact-card">
+            <form id="contact-form" class="formspree-form" action="https://formspree.io/f/mpqvabgw" method="POST">
+              <label class="form-group">
+                <span>Your Name</span>
+                <input id="contact-name" name="name" type="text" placeholder="John Doe" required />
+              </label>
+              <label class="form-group">
+                <span>Email</span>
+                <input id="contact-email" name="email" type="email" placeholder="you@example.com" required />
+              </label>
+              <label class="form-group">
+                <span>Message</span>
+                <textarea id="contact-message" name="message" rows="5" placeholder="How can we help?" required></textarea>
+              </label>
+              <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+            <p class="support-link">Direct email: <a href="mailto:apexquant.support@proton.me">apexquant.support@proton.me</a></p>
+          </div>
+        </section>
+      </main>
     </div>
+  </div>
 
-    <script type="module" src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
