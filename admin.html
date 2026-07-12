@@ -707,36 +707,26 @@
          */
         async function loadOverviewStats() {
             try {
-                // Get total users
-                const { count: userCount } = await supabase
-                    .from('profiles')
-                    .select('*', { count: 'exact', head: true });
+                // Use RPC function for admin overview stats
+                const { data: stats, error } = await supabase.rpc('get_admin_overview_stats');
                 
-                // Get total deposits (approved)
-                const { data: deposits } = await supabase
-                    .from('deposits')
-                    .select('amount')
-                    .eq('status', 'approved');
-                const totalDeposits = deposits?.reduce((sum, d) => sum + parseFloat(d.amount), 0) || 0;
+                if (error) throw error;
                 
-                // Get total withdrawals (approved)
-                const { data: withdrawals } = await supabase
-                    .from('withdrawals')
-                    .select('amount')
-                    .eq('status', 'approved');
-                const totalWithdrawals = withdrawals?.reduce((sum, w) => sum + parseFloat(w.amount), 0) || 0;
-                
-                // Get active investments
-                const { count: activeInvCount } = await supabase
-                    .from('investments')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('status', 'active');
+                const statsData = stats && stats[0] ? stats[0] : {
+                    total_users: 0,
+                    total_deposits_amount: 0,
+                    total_withdrawals_amount: 0,
+                    total_investments_amount: 0,
+                    pending_deposits_count: 0,
+                    pending_withdrawals_count: 0,
+                    active_investments_count: 0
+                };
                 
                 // Update UI
-                document.getElementById('stat-users').textContent = userCount || 0;
-                document.getElementById('stat-deposits').textContent = '$' + (totalDeposits || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                document.getElementById('stat-withdrawals').textContent = '$' + (totalWithdrawals || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                document.getElementById('stat-investments').textContent = activeInvCount || 0;
+                document.getElementById('stat-users').textContent = statsData.total_users || 0;
+                document.getElementById('stat-deposits').textContent = '$' + (statsData.total_deposits_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('stat-withdrawals').textContent = '$' + (statsData.total_withdrawals_amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                document.getElementById('stat-investments').textContent = statsData.active_investments_count || 0;
                 
                 // Load recent activity
                 await loadRecentActivity();
@@ -747,36 +737,28 @@
         }
         
         /**
-         * Load recent activity for overview
+         * Load recent activity for overview - uses RPC functions
          */
         async function loadRecentActivity() {
             try {
-                // Get recent deposits
-                const { data: recentDeposits } = await supabase
-                    .from('deposits')
-                    .select('*, profiles:user_id(email)')
-                    .order('created_at', { ascending: false })
-                    .limit(5);
+                // Get recent deposits via RPC
+                const { data: recentDeposits } = await supabase.rpc('get_recent_deposits', { limit_count: 10 });
                 
-                // Get recent withdrawals
-                const { data: recentWithdrawals } = await supabase
-                    .from('withdrawals')
-                    .select('*, profiles:user_id(email)')
-                    .order('created_at', { ascending: false })
-                    .limit(5);
+                // Get recent withdrawals via RPC
+                const { data: recentWithdrawals } = await supabase.rpc('get_recent_withdrawals', { limit_count: 10 });
                 
                 // Combine and sort
                 const activities = [
                     ...(recentDeposits || []).map(d => ({
                         type: 'deposit',
-                        email: d.profiles?.email || 'Unknown',
+                        email: d.user_email || 'Unknown',
                         amount: d.amount,
                         status: d.status,
                         date: new Date(d.created_at)
                     })),
                     ...(recentWithdrawals || []).map(w => ({
                         type: 'withdrawal',
-                        email: w.profiles?.email || 'Unknown',
+                        email: w.user_email || 'Unknown',
                         amount: w.amount,
                         status: w.status,
                         date: new Date(w.created_at)
@@ -813,14 +795,11 @@
         }
         
         /**
-         * Load users table
+         * Load users table - uses RPC function for admin access
          */
         async function loadUsers() {
             try {
-                const { data: users, error } = await supabase
-                    .from('profiles')
-                    .select('*, auth:user_id(email)')
-                    .order('created_at', { ascending: false });
+                const { data: users, error } = await supabase.rpc('get_all_users');
                 
                 if (error) throw error;
                 
@@ -833,7 +812,7 @@
                 
                 tbody.innerHTML = users.map(user => `
                     <tr>
-                        <td class="user-email-cell" title="${user.auth?.email || 'N/A'}">${user.auth?.email || 'N/A'}</td>
+                        <td class="user-email-cell" title="${user.email || 'N/A'}">${user.email || 'N/A'}</td>
                         <td>$${parseFloat(user.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                         <td><span class="status-badge status-${user.status || 'active'}">${user.status || 'active'}</span></td>
                         <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
@@ -842,7 +821,7 @@
                                 ? `<button class="action-btn btn-unfreeze" onclick="unfreezeUser('${user.id}')">Unfreeze</button>`
                                 : `<button class="action-btn btn-freeze" onclick="freezeUser('${user.id}')">Freeze</button>`
                             }
-                            <button class="action-btn btn-adjust" onclick="openAdjustModal('${user.id}', '${user.auth?.email || 'N/A'}', ${user.balance || 0})">Adjust</button>
+                            <button class="action-btn btn-adjust" onclick="openAdjustModal('${user.id}', '${user.email || 'N/A'}', ${user.balance || 0})">Adjust</button>
                         </td>
                     </tr>
                 `).join('');
@@ -962,14 +941,11 @@
         window.submitBalanceAdjustment = submitBalanceAdjustment;
         
         /**
-         * Load deposits table
+         * Load deposits table - uses RPC function for admin access
          */
         async function loadDeposits() {
             try {
-                const { data: deposits, error } = await supabase
-                    .from('deposits')
-                    .select('*, profiles:user_id(email)')
-                    .order('created_at', { ascending: false });
+                const { data: deposits, error } = await supabase.rpc('get_all_deposits');
                 
                 if (error) throw error;
                 
@@ -982,10 +958,10 @@
                 
                 tbody.innerHTML = deposits.map(deposit => `
                     <tr>
-                        <td class="user-email-cell">${deposit.profiles?.email || 'N/A'}</td>
+                        <td class="user-email-cell">${deposit.user_email || 'N/A'}</td>
                         <td>$${parseFloat(deposit.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                         <td style="font-family: monospace; font-size: 12px;" title="${deposit.transaction_hash}">
-                            ${deposit.transaction_hash.substring(0, 10)}...
+                            ${(deposit.transaction_hash || '').substring(0, 10)}...
                         </td>
                         <td>${new Date(deposit.created_at).toLocaleDateString()}</td>
                         <td><span class="status-badge status-${deposit.status}">${deposit.status}</span></td>
@@ -1052,14 +1028,11 @@
         window.rejectDeposit = rejectDeposit;
         
         /**
-         * Load withdrawals table
+         * Load withdrawals table - uses RPC function for admin access
          */
         async function loadWithdrawals() {
             try {
-                const { data: withdrawals, error } = await supabase
-                    .from('withdrawals')
-                    .select('*, profiles:user_id(email)')
-                    .order('created_at', { ascending: false });
+                const { data: withdrawals, error } = await supabase.rpc('get_all_withdrawals');
                 
                 if (error) throw error;
                 
@@ -1095,7 +1068,7 @@
                     
                     return `
                         <tr>
-                            <td class="user-email-cell">${withdrawal.profiles?.email || 'N/A'}</td>
+                            <td class="user-email-cell">${withdrawal.user_email || 'N/A'}</td>
                             <td>$${parseFloat(withdrawal.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                             <td>${withdrawal.method}</td>
                             <td style="font-size: 12px;">${details}</td>
@@ -1165,14 +1138,11 @@
         window.rejectWithdrawal = rejectWithdrawal;
         
         /**
-         * Load investments table
+         * Load investments table - uses RPC function for admin access
          */
         async function loadInvestments() {
             try {
-                const { data: investments, error } = await supabase
-                    .from('investments')
-                    .select('*, profiles:user_id(email)')
-                    .order('created_at', { ascending: false });
+                const { data: investments, error } = await supabase.rpc('get_all_investments');
                 
                 if (error) throw error;
                 
@@ -1185,7 +1155,7 @@
                 
                 tbody.innerHTML = investments.map(inv => `
                     <tr>
-                        <td class="user-email-cell">${inv.profiles?.email || 'N/A'}</td>
+                        <td class="user-email-cell">${inv.user_email || 'N/A'}</td>
                         <td>Tier ${inv.tier}</td>
                         <td>$${parseFloat(inv.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                         <td>${inv.roi_percentage}%</td>
