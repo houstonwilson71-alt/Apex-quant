@@ -121,13 +121,13 @@ function navigateTo(sectionId) {
     if (sidebar) sidebar.classList.remove('mobile-open');
     
     // Refresh data when navigating to specific sections
-    if (sectionId === 'deposit' || sectionId === 'withdraw') {
+    if (sectionId === 'deposit' || sectionId === 'deposit-section' || sectionId === 'withdraw' || sectionId === 'withdrawal-section') {
         refreshBalanceDisplay();
     }
-    if (sectionId === 'deposit') {
+    if (sectionId === 'deposit' || sectionId === 'deposit-section') {
         loadDepositHistory();
     }
-    if (sectionId === 'withdraw') {
+    if (sectionId === 'withdraw' || sectionId === 'withdrawal-section') {
         loadWithdrawalHistory();
     }
     if (sectionId === 'home') {
