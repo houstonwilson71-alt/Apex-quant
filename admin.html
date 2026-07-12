@@ -1226,51 +1226,77 @@
         
         /**
          * Check if user is admin and show appropriate view
+         * Uses getUser() and maybeSingle() for reliable profile access
          */
         async function checkAdminAccess() {
             console.log('[Admin] Checking admin access...');
-            const { data: { session } } = await supabase.auth.getSession();
             
-            if (!session?.user) {
-                console.log('[Admin] No session found');
-                adminAuthContainer.classList.remove('hidden');
-                adminDashboardContainer.classList.add('hidden');
-                accessDeniedContainer.classList.add('hidden');
-                return;
-            }
-            
-            console.log('[Admin] Session found for:', session.user.email);
-            
-            // Check if user is admin
-            const { data: profile, error: profileError } = await supabase
-                .from('profiles')
-                .select('is_admin, status')
-                .eq('id', session.user.id)
-                .single();
-            
-            if (profileError) {
-                console.error('[Admin] Error fetching profile:', profileError);
-            }
-            
-            console.log('[Admin] Profile data:', profile);
-            
-            if (profile?.is_admin && profile?.status !== 'frozen') {
-                // Admin user - show dashboard
-                console.log('[Admin] Access granted - showing dashboard');
-                adminAuthContainer.classList.add('hidden');
-                adminDashboardContainer.classList.remove('hidden');
-                accessDeniedContainer.classList.add('hidden');
-                document.getElementById('admin-email').textContent = session.user.email;
+            try {
+                // Use getUser() for reliable user data
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
                 
-                // Load initial data
-                loadOverviewStats();
-            } else {
-                // Not admin or frozen
-                console.log('[Admin] Access denied - not admin or frozen');
-                adminAuthContainer.classList.add('hidden');
-                adminDashboardContainer.classList.add('hidden');
-                accessDeniedContainer.classList.remove('hidden');
+                if (userError) {
+                    console.error('[Admin] Error getting user:', userError);
+                    showAuthForm();
+                    return;
+                }
+                
+                if (!user) {
+                    console.log('[Admin] No user found');
+                    showAuthForm();
+                    return;
+                }
+                
+                console.log('[Admin] User found:', user.email);
+                
+                // Query profile with maybeSingle() to handle missing profiles gracefully
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('is_admin, status')
+                    .eq('id', user.id)
+                    .maybeSingle();
+                
+                if (profileError) {
+                    console.error('[Admin] Error fetching profile:', profileError);
+                    showAccessDenied();
+                    return;
+                }
+                
+                console.log('[Admin] Profile data:', profile);
+                
+                // Check if user is admin and not frozen
+                if (profile && profile.is_admin === true && profile.status !== 'frozen') {
+                    // Admin user - show dashboard
+                    console.log('[Admin] ✓ Access granted - showing dashboard');
+                    adminAuthContainer.classList.add('hidden');
+                    adminDashboardContainer.classList.remove('hidden');
+                    accessDeniedContainer.classList.add('hidden');
+                    document.getElementById('admin-email').textContent = user.email;
+                    
+                    // Load initial data
+                    loadOverviewStats();
+                } else {
+                    // Not admin, no profile, or frozen
+                    console.log('[Admin] ✗ Access denied - not admin or profile missing');
+                    showAccessDenied();
+                }
+                
+            } catch (err) {
+                console.error('[Admin] Unexpected error:', err);
+                showAuthForm();
             }
+        }
+        
+        function showAuthForm() {
+            adminAuthContainer.classList.remove('hidden');
+            adminDashboardContainer.classList.add('hidden');
+            accessDeniedContainer.classList.add('hidden');
+        }
+        
+        function showAccessDenied() {
+            adminAuthContainer.classList.add('hidden');
+            adminDashboardContainer.classList.add('hidden');
+            accessDeniedContainer.classList.remove('hidden');
         }
         
         /**
@@ -1288,30 +1314,44 @@
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] Login error:', error);
+                    throw error;
+                }
                 
-                // Check admin status after login
-                const { data: profile } = await supabase
+                console.log('[Admin] Login successful for:', data.user.email);
+                
+                // Check admin status after login using maybeSingle()
+                const { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('is_admin, status')
                     .eq('id', data.user.id)
-                    .single();
+                    .maybeSingle();
                 
-                if (profile?.is_admin && profile?.status !== 'frozen') {
+                if (profileError) {
+                    console.error('[Admin] Profile fetch error:', profileError);
+                }
+                
+                console.log('[Admin] Profile after login:', profile);
+                
+                if (profile && profile.is_admin === true && profile.status !== 'frozen') {
                     // Success - show dashboard
+                    console.log('[Admin] ✓ Login successful - showing dashboard');
                     adminAuthContainer.classList.add('hidden');
                     adminDashboardContainer.classList.remove('hidden');
                     accessDeniedContainer.classList.add('hidden');
                     document.getElementById('admin-email').textContent = data.user.email;
                     loadOverviewStats();
                 } else {
-                    // Not admin - sign out and show error
+                    // Not admin or no profile - sign out and show error
+                    console.log('[Admin] ✗ Not admin or profile missing');
                     await supabase.auth.signOut();
                     errorEl.textContent = 'Access denied. Administrator privileges required.';
                     errorEl.classList.add('show');
                 }
                 
             } catch (error) {
+                console.error('[Admin] Login error:', error);
                 errorEl.textContent = error.message;
                 errorEl.classList.add('show');
             }
