@@ -325,6 +325,72 @@ function formatDate(dateString) {
     });
 }
 
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+function showHistoryLoading(container, message) {
+    if (!container) return;
+    container.innerHTML = `<div class="history-state history-loading">${escapeHtml(message)}</div>`;
+}
+
+function showHistoryEmpty(container, message) {
+    if (!container) return;
+    container.innerHTML = `<div class="history-state history-empty">${escapeHtml(message)}</div>`;
+}
+
+function showHistoryError(container, message) {
+    if (!container) return;
+    container.innerHTML = `<div class="history-state history-error">${escapeHtml(message)}</div>`;
+}
+
+function getStatusClassName(status = 'pending') {
+    const normalizedStatus = String(status || 'pending').toLowerCase();
+    if (normalizedStatus === 'approved') return 'approved';
+    if (normalizedStatus === 'rejected') return 'rejected';
+    if (normalizedStatus === 'active') return 'active';
+    return 'pending';
+}
+
+function getShortTxHash(value) {
+    const hash = String(value || '').trim();
+    return hash ? `${hash.slice(0, 10)}...` : 'N/A';
+}
+
+function parseWithdrawalDetails(details) {
+    if (!details) return {};
+    if (typeof details === 'string') {
+        try {
+            return JSON.parse(details);
+        } catch {
+            return {};
+        }
+    }
+    return details;
+}
+
+function getWithdrawalDetailsLabel(details, method) {
+    const safeDetails = parseWithdrawalDetails(details);
+
+    switch (method) {
+        case 'paypal':
+            return safeDetails.email || 'No PayPal email provided';
+        case 'bank':
+            return safeDetails.iban ? `IBAN: ${safeDetails.iban}` : 'No bank details provided';
+        case 'usdt':
+            return safeDetails.address || 'No USDT address provided';
+        case 'cashapp':
+            return safeDetails.cashtag || 'No CashApp tag provided';
+        default:
+            return 'N/A';
+    }
+}
+
 function getDaysRemaining(endDate) {
     const end = new Date(endDate);
     const now = new Date();
@@ -386,6 +452,88 @@ async function loadDashboard(user) {
 
     } catch (err) {
         console.error('Error loading dashboard:', err);
+    }
+}
+
+async function loadRecentActivity() {
+    const container = document.getElementById('recent-activity-list');
+    if (!container) return;
+
+    showHistoryLoading(container, 'Loading recent activity...');
+
+    try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+            showHistoryError(container, 'Authentication error: ' + userError.message);
+            return;
+        }
+
+        if (!user) {
+            showHistoryEmpty(container, 'Please sign in to view your recent activity.');
+            return;
+        }
+
+        const { data: deposits, error: depositsError } = await supabase
+            .from('deposits')
+            .select('id, amount, status, created_at, transaction_hash, chain')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+        if (depositsError) {
+            throw depositsError;
+        }
+
+        const { data: withdrawals, error: withdrawalsError } = await supabase
+            .from('withdrawals')
+            .select('id, amount, status, created_at, method')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+        if (withdrawalsError) {
+            throw withdrawalsError;
+        }
+
+        const activity = [
+            ...(deposits || []).map(item => ({
+                type: 'deposit',
+                amount: item.amount,
+                status: item.status,
+                created_at: item.created_at,
+                label: `Deposit • ${item.chain?.toUpperCase() || 'BSC'}`
+            })),
+            ...(withdrawals || []).map(item => ({
+                type: 'withdrawal',
+                amount: item.amount,
+                status: item.status,
+                created_at: item.created_at,
+                label: `Withdrawal • ${item.method?.toUpperCase() || 'USDT'}`
+            }))
+        ]
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .slice(0, 5);
+
+        if (!activity.length) {
+            showHistoryEmpty(container, 'No recent activity yet.');
+            return;
+        }
+
+        container.innerHTML = activity.map(item => `
+            <div class="history-item">
+                <div class="history-info">
+                    <div>
+                        <div class="history-amount">${item.type === 'deposit' ? '+' : '-'}${formatCurrency(item.amount)}</div>
+                        <div class="history-date">${formatDate(item.created_at)}</div>
+                        <div class="history-method">${escapeHtml(item.label)}</div>
+                    </div>
+                </div>
+                <span class="status-badge status-${getStatusClassName(item.status)}">${escapeHtml(item.status)}</span>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error('loadRecentActivity error:', err);
+        showHistoryError(container, 'Unable to load recent activity: ' + (err.message || 'Unknown error'));
     }
 }
 
@@ -471,7 +619,7 @@ function showDepositMessage(message, type) {
 }
 
 // =====================================================
-// DEPOSIT HISTORY — FIXED WITH VISIBLE ERRORS
+// DEPOSIT HISTORY
 // =====================================================
 async function loadDepositHistory() {
     const container = document.getElementById('deposit-history');
@@ -480,14 +628,17 @@ async function loadDepositHistory() {
         return;
     }
 
+    showHistoryLoading(container, 'Loading your deposit history...');
+
     try {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError) {
-            container.innerHTML = '<p style="color:red;">Auth error: ' + userError.message + '</p>';
+            showHistoryError(container, 'Authentication error: ' + userError.message);
             return;
         }
+
         if (!user) {
-            container.innerHTML = '<p style="color:orange;">Please log in to see your deposits.</p>';
+            showHistoryEmpty(container, 'Please sign in to view your deposit history.');
             return;
         }
 
@@ -498,34 +649,48 @@ async function loadDepositHistory() {
             .order('created_at', { ascending: false });
 
         if (error) {
-            container.innerHTML = '<p style="color:red;">❌ Error: ' + error.message + ' (Code: ' + error.code + ')</p>';
             console.error('Deposit fetch error:', error);
+            showHistoryError(container, 'Unable to load deposits: ' + (error.message || 'Unknown error'));
             return;
         }
 
         if (!deposits || deposits.length === 0) {
-            container.innerHTML = '<p style="color:#aaa;">No deposit transactions yet.</p>';
+            showHistoryEmpty(container, 'No deposit transactions yet.');
             return;
         }
 
-        let html = '<table style="width:100%;border-collapse:collapse;margin-top:10px;color:#fff;">';
-        html += '<thead><tr><th>Amount</th><th>Network</th><th>TX Hash</th><th>Status</th><th>Date</th></tr></thead><tbody>';
-        deposits.forEach(d => {
-            const statusColor = d.status === 'approved' ? '#00cc66' : d.status === 'rejected' ? '#ff4444' : '#ffaa00';
-            html += '<tr>' +
-                '<td>$' + d.amount + '</td>' +
-                '<td>' + (d.chain ? d.chain.toUpperCase() : 'N/A') + '</td>' +
-                '<td>' + (d.transaction_hash ? d.transaction_hash.substring(0,10) + '...' : 'N/A') + '</td>' +
-                '<td style="color:' + statusColor + ';font-weight:bold;">' + d.status.toUpperCase() + '</td>' +
-                '<td>' + new Date(d.created_at).toLocaleDateString() + '</td>' +
-                '</tr>';
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
+        container.innerHTML = `
+            <div class="table-responsive">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Amount</th>
+                            <th>Network</th>
+                            <th>TX Hash</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${deposits.map(deposit => `
+                            <tr>
+                                <td class="amount-cell">${formatCurrency(deposit.amount)}</td>
+                                <td>
+                                    <span class="chain-badge ${escapeHtml((deposit.chain || 'bsc').toLowerCase())}">${escapeHtml((deposit.chain || 'bsc').toUpperCase())}</span>
+                                </td>
+                                <td class="txhash-cell"><span class="txhash">${escapeHtml(getShortTxHash(deposit.transaction_hash))}</span></td>
+                                <td><span class="status-badge status-${getStatusClassName(deposit.status)}">${escapeHtml((deposit.status || 'pending').toUpperCase())}</span></td>
+                                <td class="date-cell">${formatDate(deposit.created_at)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
 
     } catch (err) {
-        container.innerHTML = '<p style="color:red;">⚠️ Unexpected error: ' + err.message + '</p>';
         console.error('loadDepositHistory exception:', err);
+        showHistoryError(container, 'Unexpected error loading deposits: ' + (err.message || 'Unknown error'));
     }
 }
 
@@ -541,14 +706,17 @@ async function loadWithdrawalHistory() {
         return;
     }
 
+    showHistoryLoading(container, 'Loading your withdrawal history...');
+
     try {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
         if (userError) {
-            container.innerHTML = '<p style="color:red;">Auth error: ' + userError.message + '</p>';
+            showHistoryError(container, 'Authentication error: ' + userError.message);
             return;
         }
+
         if (!user) {
-            container.innerHTML = '<p style="color:orange;">Please log in to see your withdrawals.</p>';
+            showHistoryEmpty(container, 'Please sign in to view your withdrawal history.');
             return;
         }
 
@@ -559,33 +727,46 @@ async function loadWithdrawalHistory() {
             .order('created_at', { ascending: false });
 
         if (error) {
-            container.innerHTML = '<p style="color:red;">❌ Error: ' + error.message + ' (Code: ' + error.code + ')</p>';
             console.error('Withdrawal fetch error:', error);
+            showHistoryError(container, 'Unable to load withdrawals: ' + (error.message || 'Unknown error'));
             return;
         }
 
         if (!withdrawals || withdrawals.length === 0) {
-            container.innerHTML = '<p style="color:#aaa;">No withdrawal transactions yet.</p>';
+            showHistoryEmpty(container, 'No withdrawal transactions yet.');
             return;
         }
 
-        let html = '<table style="width:100%;border-collapse:collapse;margin-top:10px;color:#fff;">';
-        html += '<thead><tr><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead><tbody>';
-        withdrawals.forEach(w => {
-            const statusColor = w.status === 'approved' ? '#00cc66' : w.status === 'rejected' ? '#ff4444' : '#ffaa00';
-            html += '<tr>' +
-                '<td>$' + w.amount + '</td>' +
-                '<td>' + (w.method ? w.method.charAt(0).toUpperCase() + w.method.slice(1) : 'N/A') + '</td>' +
-                '<td style="color:' + statusColor + ';font-weight:bold;">' + w.status.toUpperCase() + '</td>' +
-                '<td>' + new Date(w.created_at).toLocaleDateString() + '</td>' +
-                '</tr>';
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
+        container.innerHTML = `
+            <div class="table-responsive">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Details</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${withdrawals.map(withdrawal => `
+                            <tr>
+                                <td class="amount-cell">${formatCurrency(withdrawal.amount)}</td>
+                                <td class="method-cell">${escapeHtml((withdrawal.method || 'usdt').toUpperCase())}</td>
+                                <td class="txhash-cell">${escapeHtml(getWithdrawalDetailsLabel(withdrawal.details, withdrawal.method))}</td>
+                                <td><span class="status-badge status-${getStatusClassName(withdrawal.status)}">${escapeHtml((withdrawal.status || 'pending').toUpperCase())}</span></td>
+                                <td class="date-cell">${formatDate(withdrawal.created_at)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
 
     } catch (err) {
-        container.innerHTML = '<p style="color:red;">⚠️ Unexpected error: ' + err.message + '</p>';
         console.error('loadWithdrawalHistory exception:', err);
+        showHistoryError(container, 'Unexpected error loading withdrawals: ' + (err.message || 'Unknown error'));
     }
 }
 
