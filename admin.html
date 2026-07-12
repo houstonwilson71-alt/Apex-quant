@@ -1378,29 +1378,25 @@
         checkAdminAccess();
     </script>
 
-    <!-- Foolproof Admin Override -->
+    <!-- Hard-coded Admin Access for specific user ID -->
     <script>
-      (async function overrideAdmin() {
+      (async () => {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .maybeSingle();
-        if (profile?.is_admin === true) {
-          window.IS_ADMIN = true;
-          const adminDashboard = document.getElementById('admin-dashboard');
-          if (adminDashboard) adminDashboard.style.display = 'block';
-          // Call existing admin load functions if they exist
-          if (typeof loadAdminUsers === 'function') {
-            loadAdminUsers();
-            loadAdminDeposits();
-            loadAdminWithdrawals();
-            loadAdminInvestments();
-          }
-        } else {
-          document.body.innerHTML = '<p style="color:red;text-align:center;margin-top:50px;">Access Denied<br>You do not have administrator privileges.</p>';
+        if (!user) {
+          document.body.innerHTML = 'Please log in.';
+          return;
+        }
+        if (user.id !== '603de7c0-cdfd-4d54-b644-a0da48fb8da9') {
+          document.body.innerHTML = '<p style="color:red;text-align:center;margin-top:50px;">Access Denied</p>';
+          return;
+        }
+        // Admin confirmed – show dashboard and load data
+        document.getElementById('dashboard-container').style.display = 'block';
+        if (typeof loadAdminUsers === 'function') {
+          loadAdminUsers();
+          loadAdminDeposits();
+          loadAdminWithdrawals();
+          loadAdminInvestments();
         }
       })();
     </script>
