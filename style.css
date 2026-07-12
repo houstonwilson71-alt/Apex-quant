@@ -1448,9 +1448,109 @@ body {
 }
 
 /* =====================================================
-   History Items
+   Transaction Tables - Futuristic Design
    ===================================================== */
 
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 500px;
+}
+
+.transaction-table thead {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(0, 212, 255, 0.1) 100%);
+    border-radius: var(--radius-md);
+}
+
+.transaction-table th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--neon-blue);
+    border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.transaction-table th:first-child {
+    border-radius: var(--radius-md) 0 0 0;
+}
+
+.transaction-table th:last-child {
+    border-radius: 0 var(--radius-md) 0 0;
+}
+
+.transaction-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.transaction-table tbody tr {
+    transition: all var(--transition-base);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.transaction-table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.1);
+    transform: translateX(4px);
+}
+
+.transaction-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.transaction-table tbody tr:last-child {
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
+/* Table cell styles */
+.amount-cell {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 15px;
+}
+
+.txhash-cell {
+    font-family: 'Space Grotesk', monospace;
+}
+
+.txhash {
+    background: rgba(0, 212, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--neon-cyan);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.method-cell {
+    text-transform: capitalize;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.date-cell {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* Table empty state */
+.transaction-table .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* History Items (for other sections) */
 .history-item {
     display: flex;
     justify-content: space-between;
@@ -1815,6 +1915,17 @@ body {
     
     .admin-stats {
         grid-template-columns: 1fr;
+    }
+    
+    .transaction-table th,
+    .transaction-table td {
+        padding: 12px 10px;
+        font-size: 12px;
+    }
+    
+    .txhash {
+        font-size: 10px;
+        padding: 3px 6px;
     }
 }
 

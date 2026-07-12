@@ -607,27 +607,33 @@ async function loadDepositHistory() {
             .from('deposits')
             .select('*')
             .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(10);
+            .order('created_at', { ascending: false });
         
         const container = document.getElementById('deposit-history');
         if (!container) return;
         
         if (!deposits || deposits.length === 0) {
-            container.innerHTML = '<p class="empty-state">No deposits yet</p>';
+            container.innerHTML = '<tr><td colspan="5" class="empty-state">No transactions yet.</td></tr>';
             return;
         }
         
-        container.innerHTML = deposits.map(deposit => `
-            <div class="history-item">
-                <div class="history-info">
-                    <span class="history-amount">$${parseFloat(deposit.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                    <span class="chain-badge ${deposit.chain || 'bsc'}">${(deposit.chain || 'bsc').toUpperCase()}</span>
-                    <span class="history-date">${new Date(deposit.created_at).toLocaleDateString()}</span>
-                </div>
-                <span class="status-badge status-${deposit.status}">${deposit.status}</span>
-            </div>
-        `).join('');
+        container.innerHTML = deposits.map(deposit => {
+            const network = (deposit.chain || 'bsc').toUpperCase();
+            const statusClass = deposit.status === 'pending' ? 'status-pending' : 
+                               deposit.status === 'approved' ? 'status-approved' : 'status-rejected';
+            const txHash = deposit.tx_hash || deposit.transaction_hash || 'N/A';
+            const txDisplay = txHash.length > 20 ? txHash.substring(0, 10) + '...' + txHash.substring(txHash.length - 8) : txHash;
+            
+            return `
+                <tr>
+                    <td class="amount-cell">$${parseFloat(deposit.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td><span class="chain-badge ${deposit.chain || 'bsc'}">${network}</span></td>
+                    <td class="txhash-cell"><code class="txhash">${txDisplay}</code></td>
+                    <td><span class="status-badge ${statusClass}">${deposit.status}</span></td>
+                    <td class="date-cell">${new Date(deposit.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                </tr>
+            `;
+        }).join('');
         
     } catch (error) {
         console.error('Error loading deposit history:', error);
@@ -760,27 +766,29 @@ async function loadWithdrawalHistory() {
             .from('withdrawals')
             .select('*')
             .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(10);
+            .order('created_at', { ascending: false });
         
         const container = document.getElementById('withdrawal-history');
         if (!container) return;
         
         if (!withdrawals || withdrawals.length === 0) {
-            container.innerHTML = '<p class="empty-state">No withdrawals yet</p>';
+            container.innerHTML = '<tr><td colspan="4" class="empty-state">No transactions yet.</td></tr>';
             return;
         }
         
-        container.innerHTML = withdrawals.map(withdrawal => `
-            <div class="history-item">
-                <div class="history-info">
-                    <span class="history-amount">$${parseFloat(withdrawal.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                    <span class="history-method">${withdrawal.method.toUpperCase()}</span>
-                    <span class="history-date">${new Date(withdrawal.created_at).toLocaleDateString()}</span>
-                </div>
-                <span class="status-badge status-${withdrawal.status}">${withdrawal.status}</span>
-            </div>
-        `).join('');
+        container.innerHTML = withdrawals.map(withdrawal => {
+            const statusClass = withdrawal.status === 'pending' ? 'status-pending' : 
+                               withdrawal.status === 'approved' ? 'status-approved' : 'status-rejected';
+            
+            return `
+                <tr>
+                    <td class="amount-cell">$${parseFloat(withdrawal.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                    <td class="method-cell">${withdrawal.method.charAt(0).toUpperCase() + withdrawal.method.slice(1)}</td>
+                    <td><span class="status-badge ${statusClass}">${withdrawal.status}</span></td>
+                    <td class="date-cell">${new Date(withdrawal.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                </tr>
+            `;
+        }).join('');
         
     } catch (error) {
         console.error('Error loading withdrawal history:', error);
