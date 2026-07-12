@@ -199,16 +199,16 @@ DO $$
 DECLARE
   v_jobid bigint;
 BEGIN
-  SELECT jobid INTO v_jobid
-  FROM cron.job
-  WHERE jobname = 'process-investments';
+  IF to_regclass('cron.job') IS NOT NULL THEN
+    SELECT jobid INTO v_jobid
+    FROM cron.job
+    WHERE jobname = 'process-investments';
 
-  IF v_jobid IS NOT NULL THEN
-    PERFORM cron.unschedule(v_jobid);
+    IF v_jobid IS NULL THEN
+      PERFORM cron.schedule('process-investments', '*/5 * * * *', 'SELECT process_mature_investments()');
+    END IF;
   END IF;
 END $$;
-
-SELECT cron.schedule('process-investments', '*/5 * * * *', 'SELECT process_mature_investments()');
 
 CREATE OR REPLACE FUNCTION request_deposit(amount NUMERIC, tx_hash TEXT, chain TEXT)
 RETURNS void
