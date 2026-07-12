@@ -1377,5 +1377,32 @@
         // Initialize
         checkAdminAccess();
     </script>
+
+    <!-- Foolproof Admin Override -->
+    <script>
+      (async function overrideAdmin() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (profile?.is_admin === true) {
+          window.IS_ADMIN = true;
+          const adminDashboard = document.getElementById('admin-dashboard');
+          if (adminDashboard) adminDashboard.style.display = 'block';
+          // Call existing admin load functions if they exist
+          if (typeof loadAdminUsers === 'function') {
+            loadAdminUsers();
+            loadAdminDeposits();
+            loadAdminWithdrawals();
+            loadAdminInvestments();
+          }
+        } else {
+          document.body.innerHTML = '<p style="color:red;text-align:center;margin-top:50px;">Access Denied<br>You do not have administrator privileges.</p>';
+        }
+      })();
+    </script>
 </body>
 </html>
