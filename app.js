@@ -613,7 +613,7 @@ async function loadDepositHistory() {
       .order('created_at', { ascending: false });
     
     if (error) {
-      container.innerHTML = '<p style="color:red;">Error loading deposits.</p>';
+      container.innerHTML = '<p style="color:red;">Error: ' + error.message + ' (Code: ' + error.code + ')</p>';
       console.error('Deposit fetch error:', error);
       return;
     }
@@ -776,7 +776,7 @@ async function loadWithdrawalHistory() {
       .order('created_at', { ascending: false });
     
     if (error) {
-      container.innerHTML = '<p style="color:red;">Error loading withdrawals.</p>';
+      container.innerHTML = '<p style="color:red;">Error: ' + error.message + ' (Code: ' + error.code + ')</p>';
       console.error('Withdrawal fetch error:', error);
       return;
     }
