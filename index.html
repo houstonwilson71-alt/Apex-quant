@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - Apex Quant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Auth Container -->
+        <div id="auth-container" class="card">
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <h1>Welcome Back</h1>
+                <p class="subtitle">Sign in to your account</p>
+
+                <div id="login-error" class="error-message"></div>
+
+                <form>
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <input type="email" id="login-email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="Enter your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Sign In</button>
+                </form>
+
+                <div class="form-footer">
+                    <p>
+                        <button type="button" id="show-reset-password" class="btn-link">Forgot password?</button>
+                    </p>
+                    <p>
+                        Don't have an account? 
+                        <button type="button" id="show-signup" class="btn-link">Sign up</button>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="signup-form" class="auth-form">
+                <h1>Create Account</h1>
+                <p class="subtitle">Join us today</p>
+
+                <div id="signup-error" class="error-message"></div>
+                <div id="signup-success" class="success-message"></div>
+
+                <form>
+                    <div class="form-group">
+                        <label for="signup-email">Email Address</label>
+                        <input type="email" id="signup-email" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" placeholder="At least 6 characters" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-confirm-password">Confirm Password</label>
+                        <input type="password" id="signup-confirm-password" placeholder="Confirm your password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                </form>
+
+                <div class="form-footer">
+                    <p>
+                        Already have an account? 
+                        <button type="button" id="show-login" class="btn-link">Sign in</button>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Reset Password Form -->
+            <div id="reset-password-form" class="auth-form">
+                <h1>Reset Password</h1>
+                <p class="subtitle">We'll send you a reset link</p>
+
+                <div id="reset-error" class="error-message"></div>
+                <div id="reset-success" class="success-message"></div>
+
+                <form>
+                    <div class="form-group">
+                        <label for="reset-email">Email Address</label>
+                        <input type="email" id="reset-email" placeholder="you@example.com" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                </form>
+
+                <div class="form-footer">
+                    <p>
+                        Remember your password? 
+                        <button type="button" id="back-to-login" class="btn-link">Sign in</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Container -->
+        <div id="dashboard-container" class="card dashboard hidden">
+            <h1>Dashboard</h1>
+            <p class="subtitle">Welcome to your account</p>
+
+            <div class="user-info">
+                <p class="label">Logged in as</p>
+                <p id="user-email" class="email"></p>
+            </div>
+
+            <p class="welcome">You're successfully authenticated!</p>
+
+            <button id="logout-btn" class="btn btn-primary">Sign Out</button>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
