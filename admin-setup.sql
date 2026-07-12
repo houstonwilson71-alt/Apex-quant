@@ -15,10 +15,18 @@ ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT false;
 ALTER TABLE profiles
 ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
 
--- Ensure status only contains valid values
-ALTER TABLE profiles
-ADD CONSTRAINT IF NOT EXISTS valid_status
-CHECK (status IN ('active', 'frozen'));
+-- Ensure status only contains valid values (PostgreSQL doesn't support ADD CONSTRAINT IF NOT EXISTS)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'valid_status' 
+        AND conrelid = 'profiles'::regclass
+    ) THEN
+        ALTER TABLE profiles
+        ADD CONSTRAINT valid_status CHECK (status IN ('active', 'frozen'));
+    END IF;
+END $$;
 
 -- =====================================================
 -- 2. Create deposits table
