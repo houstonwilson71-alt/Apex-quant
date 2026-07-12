@@ -6,7 +6,7 @@
     <title>Apex Quant - Admin Panel</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Admin-specific overrides */
+        /* Admin-specific overrides - Futuristic Design */
         .access-denied {
             display: flex;
             flex-direction: column;
@@ -17,7 +17,16 @@
         }
         
         .access-denied h1 {
-            color: #ff4757;
+            color: var(--neon-pink);
+            margin-bottom: 16px;
+            font-size: 64px;
+        }
+        
+        .access-denied h2 {
+            background: linear-gradient(135deg, var(--neon-pink), var(--electric-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 16px;
         }
         
@@ -27,15 +36,15 @@
             max-width: 400px;
         }
         
-        /* Modal styles */
+        /* Modal styles - Futuristic */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
+            background: rgba(5, 5, 17, 0.9);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -48,23 +57,25 @@
         }
         
         .modal {
-            background: rgba(30, 30, 50, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-xl);
             padding: 32px;
             max-width: 450px;
             width: 100%;
-            animation: modalSlideIn 0.3s ease;
+            animation: modalSlideIn 0.4s ease;
+            box-shadow: var(--shadow-lg), 0 0 60px rgba(99, 102, 241, 0.2);
         }
         
         @keyframes modalSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(-30px) scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
         
@@ -73,6 +84,10 @@
             font-size: 20px;
             margin-bottom: 24px;
             text-align: center;
+            background: linear-gradient(135deg, var(--neon-blue), var(--electric-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .modal .form-group {
@@ -94,7 +109,7 @@
             flex: 1;
         }
         
-        /* Admin table styles */
+        /* Admin table styles - Futuristic */
         .admin-table {
             width: 100%;
             border-collapse: collapse;
@@ -109,7 +124,7 @@
         }
         
         .admin-table th {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--neon-cyan);
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -122,7 +137,7 @@
         }
         
         .admin-table tr:hover td {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(0, 212, 255, 0.05);
         }
         
         .status-badge {
@@ -134,38 +149,43 @@
         }
         
         .status-active {
-            background: rgba(46, 213, 115, 0.2);
-            color: #2ed573;
+            background: rgba(48, 209, 88, 0.2);
+            color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(48, 209, 88, 0.2);
         }
         
         .status-frozen {
-            background: rgba(255, 71, 87, 0.2);
-            color: #ff4757;
+            background: rgba(255, 55, 95, 0.2);
+            color: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 55, 95, 0.2);
         }
         
         .status-pending {
-            background: rgba(255, 165, 2, 0.2);
-            color: #ffa502;
+            background: rgba(255, 159, 10, 0.2);
+            color: var(--neon-orange);
+            box-shadow: 0 0 10px rgba(255, 159, 10, 0.2);
         }
         
         .status-approved {
-            background: rgba(46, 213, 115, 0.2);
-            color: #2ed573;
+            background: rgba(48, 209, 88, 0.2);
+            color: var(--neon-green);
+            box-shadow: 0 0 10px rgba(48, 209, 88, 0.2);
         }
         
         .status-rejected {
-            background: rgba(255, 71, 87, 0.2);
-            color: #ff4757;
+            background: rgba(255, 55, 95, 0.2);
+            color: var(--neon-pink);
+            box-shadow: 0 0 10px rgba(255, 55, 95, 0.2);
         }
         
         .action-btn {
             padding: 8px 16px;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--transition-base);
             margin-right: 8px;
         }
         
@@ -174,35 +194,42 @@
         }
         
         .btn-freeze {
-            background: rgba(255, 71, 87, 0.2);
-            color: #ff4757;
+            background: rgba(255, 55, 95, 0.2);
+            color: var(--neon-pink);
+            border: 1px solid rgba(255, 55, 95, 0.3);
         }
         
         .btn-freeze:hover {
-            background: rgba(255, 71, 87, 0.3);
+            background: rgba(255, 55, 95, 0.3);
+            box-shadow: 0 0 15px rgba(255, 55, 95, 0.3);
         }
         
         .btn-unfreeze {
-            background: rgba(46, 213, 115, 0.2);
-            color: #2ed573;
+            background: rgba(48, 209, 88, 0.2);
+            color: var(--neon-green);
+            border: 1px solid rgba(48, 209, 88, 0.3);
         }
         
         .btn-unfreeze:hover {
-            background: rgba(46, 213, 115, 0.3);
+            background: rgba(48, 209, 88, 0.3);
+            box-shadow: 0 0 15px rgba(48, 209, 88, 0.3);
         }
         
         .btn-adjust {
-            background: rgba(99, 102, 241, 0.2);
-            color: #6366f1;
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--neon-blue);
+            border: 1px solid rgba(0, 212, 255, 0.3);
         }
         
         .btn-adjust:hover {
-            background: rgba(99, 102, 241, 0.3);
+            background: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
         }
         
         .btn-approve {
-            background: rgba(46, 213, 115, 0.2);
-            color: #2ed573;
+            background: rgba(48, 209, 88, 0.2);
+            color: var(--neon-green);
+            border: 1px solid rgba(48, 209, 88, 0.3);
         }
         
         .btn-approve:hover {
@@ -261,11 +288,24 @@
         .admin-stat-card {
             padding: 24px;
             text-align: center;
+            position: relative;
+        }
+        
+        .admin-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--electric-purple), var(--neon-cyan));
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
         }
         
         .admin-stat-icon {
             font-size: 32px;
             margin-bottom: 12px;
+            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
         }
         
         .admin-stat-value {
@@ -277,7 +317,7 @@
         
         .admin-stat-label {
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -296,13 +336,36 @@
     <div class="bg-gradient bg-gradient-2"></div>
     <div class="bg-gradient bg-gradient-3"></div>
     
+    <!-- Animated particles -->
+    <div class="particles-container">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    
     <!-- Access Denied Screen -->
     <div id="access-denied" class="access-denied hidden">
         <div class="glass-card" style="padding: 48px; max-width: 500px; text-align: center;">
-            <h1 style="color: #ff4757; font-size: 48px; margin-bottom: 24px;">⚠️</h1>
-            <h2 style="color: white; margin-bottom: 16px;">Access Denied</h2>
+            <h1>⚠️</h1>
+            <h2>Access Denied</h2>
             <p style="color: rgba(255, 255, 255, 0.7); margin-bottom: 32px;">
-                You do not have administrator privileges to access this panel.
+                You do not have administrator privileges to access this panel.<br>
+                Only users with is_admin = true can access the admin panel.
             </p>
             <a href="index.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">
                 Return to Main Site

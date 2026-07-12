@@ -1,22 +1,72 @@
 /* =====================================================
    Apex Quant - Investment Platform Styles
-   Modern Glassmorphism Design
+   Futuristic, Professional, Responsive Design
    ===================================================== */
 
-/* CSS Variables */
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CSS Variables - Futuristic Theme */
 :root {
+    /* Primary Neon Colors */
+    --neon-blue: #00d4ff;
+    --neon-cyan: #00f5d4;
+    --electric-purple: #bf5af2;
+    --neon-pink: #ff375f;
+    --neon-green: #30d158;
+    --neon-orange: #ff9f0a;
+    
+    /* Base Colors */
     --primary: #6366f1;
     --primary-dark: #4f46e5;
     --secondary: #a855f7;
     --success: #2ed573;
     --warning: #ffa502;
     --danger: #ff4757;
-    --dark-bg: #0f0f1a;
-    --glass-bg: rgba(30, 30, 50, 0.8);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    
+    /* Background Colors */
+    --dark-bg: #050511;
+    --dark-bg-secondary: #0a0a1a;
+    --dark-bg-tertiary: #12122a;
+    
+    /* Glass Colors */
+    --glass-bg: rgba(15, 15, 35, 0.7);
+    --glass-bg-hover: rgba(20, 20, 45, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-hover: rgba(255, 255, 255, 0.15);
+    --glass-glow: rgba(99, 102, 241, 0.2);
+    
+    /* Text Colors */
     --text-primary: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.7);
     --text-muted: rgba(255, 255, 255, 0.5);
+    
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-neon: 0 0 30px rgba(0, 212, 255, 0.3);
+    --shadow-glow: 0 0 60px rgba(99, 102, 241, 0.4);
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
 }
 
 /* Reset & Base */
@@ -32,16 +82,42 @@ html {
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--dark-bg);
     min-height: 100vh;
     color: var(--text-primary);
     overflow-x: hidden;
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Background Gradients */
+/* Deep Space Background */
 .bg-gradient {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -2;
+    pointer-events: none;
+    background: 
+        radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(191, 90, 242, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(0, 212, 255, 0.05) 0%, transparent 70%),
+        linear-gradient(180deg, #050511 0%, #0a0a1a 50%, #050511 100%);
+}
+
+.bg-gradient-2 {
+    background: radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.08) 0%, transparent 40%);
+}
+
+.bg-gradient-3 {
+    background: radial-gradient(circle at 70% 30%, rgba(0, 212, 255, 0.06) 0%, transparent 40%);
+}
+
+/* Animated Particles Background */
+.particles-container {
     position: fixed;
     top: 0;
     left: 0;
@@ -49,15 +125,66 @@ body {
     bottom: 0;
     z-index: -1;
     pointer-events: none;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    overflow: hidden;
 }
 
-.bg-gradient-2 {
-    background: radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%);
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particleFloat 20s infinite;
+    box-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-cyan);
 }
 
-.bg-gradient-3 {
-    background: radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+.particle:nth-child(2n) {
+    background: var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-blue);
+    animation-duration: 25s;
+}
+
+.particle:nth-child(3n) {
+    background: var(--electric-purple);
+    box-shadow: 0 0 10px var(--electric-purple), 0 0 20px var(--electric-purple);
+    animation-duration: 30s;
+}
+
+.particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.particle:nth-child(2) { left: 20%; animation-delay: 2s; }
+.particle:nth-child(3) { left: 30%; animation-delay: 4s; }
+.particle:nth-child(4) { left: 40%; animation-delay: 6s; }
+.particle:nth-child(5) { left: 50%; animation-delay: 8s; }
+.particle:nth-child(6) { left: 60%; animation-delay: 10s; }
+.particle:nth-child(7) { left: 70%; animation-delay: 12s; }
+.particle:nth-child(8) { left: 80%; animation-delay: 14s; }
+.particle:nth-child(9) { left: 90%; animation-delay: 16s; }
+.particle:nth-child(10) { left: 15%; animation-delay: 18s; }
+.particle:nth-child(11) { left: 25%; animation-delay: 1s; }
+.particle:nth-child(12) { left: 35%; animation-delay: 3s; }
+.particle:nth-child(13) { left: 45%; animation-delay: 5s; }
+.particle:nth-child(14) { left: 55%; animation-delay: 7s; }
+.particle:nth-child(15) { left: 65%; animation-delay: 9s; }
+.particle:nth-child(16) { left: 75%; animation-delay: 11s; }
+.particle:nth-child(17) { left: 85%; animation-delay: 13s; }
+.particle:nth-child(18) { left: 95%; animation-delay: 15s; }
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+    }
 }
 
 /* App Container */
@@ -68,25 +195,71 @@ body {
 }
 
 /* =====================================================
-   Glass Card Components
+   Glass Card Components - Enhanced Glassmorphism
    ===================================================== */
 
 .glass-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
+    border-radius: var(--radius-xl);
     padding: 32px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Inner glow effect */
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(0, 212, 255, 0.3), 
+        rgba(191, 90, 242, 0.3), 
+        transparent
+    );
+    opacity: 0;
+    transition: opacity var(--transition-base);
 }
 
 .glass-card:hover {
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transform: translateY(-4px);
+    border-color: var(--glass-border-hover);
+    box-shadow: 
+        var(--shadow-lg),
+        0 0 40px rgba(99, 102, 241, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-card:hover::before {
+    opacity: 1;
+}
+
+/* Glass card with neon accent */
+.glass-card-accent {
+    position: relative;
+}
+
+.glass-card-accent::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--neon-blue), var(--electric-purple), var(--neon-cyan));
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    opacity: 0.7;
 }
 
 /* =====================================================
-   Auth Container
+   Auth Container - Futuristic Design
    ===================================================== */
 
 .auth-wrapper {
@@ -98,7 +271,7 @@ body {
 }
 
 .auth-card {
-    max-width: 420px;
+    max-width: 440px;
     width: 100%;
 }
 
@@ -108,22 +281,24 @@ body {
 }
 
 .auth-header h1 {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, var(--neon-blue), var(--electric-purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 8px;
+    text-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
 }
 
 .auth-header .subtitle {
     color: var(--text-secondary);
     font-size: 15px;
+    font-weight: 400;
 }
 
 /* =====================================================
-   Form Styles
+   Form Styles - Modern Inputs
    ===================================================== */
 
 .form-group {
@@ -135,27 +310,40 @@ body {
     font-size: 14px;
     font-weight: 500;
     color: var(--text-secondary);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
     width: 100%;
     padding: 14px 18px;
     font-size: 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
     color: var(--text-primary);
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
+}
+
+.form-group input:hover,
+.form-group textarea:hover,
+.form-group select:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.12);
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
     outline: none;
-    border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    border-color: var(--neon-blue);
+    background: rgba(0, 212, 255, 0.05);
+    box-shadow: 
+        0 0 0 3px rgba(0, 212, 255, 0.15),
+        0 0 20px rgba(0, 212, 255, 0.1);
 }
 
 .form-group input::placeholder,
@@ -163,8 +351,19 @@ body {
     color: var(--text-muted);
 }
 
+/* Neon focus animation */
+@keyframes inputGlow {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15), 0 0 20px rgba(0, 212, 255, 0.1); }
+    50% { box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.25), 0 0 30px rgba(0, 212, 255, 0.2); }
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    animation: inputGlow 2s ease-in-out infinite;
+}
+
 /* =====================================================
-   Button Styles
+   Button Styles - Neon & Futuristic
    ===================================================== */
 
 .btn {
@@ -173,95 +372,162 @@ body {
     font-size: 16px;
     font-weight: 600;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+}
+
+/* Button shimmer effect */
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+    left: 100%;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: linear-gradient(135deg, var(--neon-blue), var(--primary));
     color: white;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    box-shadow: 
+        0 4px 15px rgba(0, 212, 255, 0.3),
+        0 0 30px rgba(0, 212, 255, 0.2);
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 
+        0 8px 25px rgba(0, 212, 255, 0.4),
+        0 0 50px rgba(0, 212, 255, 0.3);
 }
 
 .btn-primary:active {
-    transform: translateY(0);
+    transform: translateY(-1px);
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
 }
 
 .btn-link {
     background: none;
     border: none;
-    color: var(--primary);
+    color: var(--neon-blue);
     cursor: pointer;
     font-size: 14px;
     padding: 4px 0;
     text-decoration: none;
-    transition: color 0.2s;
+    transition: all var(--transition-fast);
+    font-weight: 500;
 }
 
 .btn-link:hover {
-    color: var(--secondary);
-    text-decoration: underline;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+/* Neon pulse animation */
+@keyframes neonPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }
+    50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.6); }
+}
+
+.btn-primary:hover {
+    animation: neonPulse 2s ease-in-out infinite;
+}
+
+/* Small button variant */
+.btn-sm {
+    padding: 10px 18px;
+    font-size: 14px;
+}
+
+/* Icon button */
+.btn-icon {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* =====================================================
-   Messages
+   Messages - Futuristic Design
    ===================================================== */
 
 .error-message {
-    background: rgba(255, 71, 87, 0.15);
-    border: 1px solid rgba(255, 71, 87, 0.3);
-    color: var(--danger);
+    background: rgba(255, 55, 95, 0.15);
+    border: 1px solid rgba(255, 55, 95, 0.3);
+    color: var(--neon-pink);
     padding: 14px 18px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 14px;
     margin-bottom: 20px;
     display: none;
+    backdrop-filter: blur(10px);
 }
 
 .error-message.show {
     display: block;
-    animation: shake 0.5s ease;
+    animation: shake 0.5s ease, slideIn 0.3s ease;
 }
 
 .success-message {
-    background: rgba(46, 213, 115, 0.15);
-    border: 1px solid rgba(46, 213, 115, 0.3);
-    color: var(--success);
+    background: rgba(48, 209, 88, 0.15);
+    border: 1px solid rgba(48, 209, 88, 0.3);
+    color: var(--neon-green);
     padding: 14px 18px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 14px;
     margin-bottom: 20px;
     display: none;
+    backdrop-filter: blur(10px);
 }
 
 .success-message.show {
     display: block;
+    animation: slideIn 0.3s ease;
 }
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* =====================================================
@@ -274,11 +540,11 @@ body {
 
 .auth-form.active {
     display: block;
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.4s ease;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(15px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -298,7 +564,7 @@ body {
 }
 
 /* =====================================================
-   Dashboard Layout
+   Dashboard Layout - Futuristic
    ===================================================== */
 
 .dashboard-layout {
@@ -307,13 +573,16 @@ body {
 }
 
 /* =====================================================
-   Sidebar
+   Sidebar - Futuristic Design
    ===================================================== */
 
 .sidebar {
     width: 280px;
-    background: linear-gradient(180deg, rgba(20, 20, 35, 0.95) 0%, rgba(15, 15, 25, 0.98) 100%);
-    backdrop-filter: blur(20px);
+    background: linear-gradient(180deg, 
+        rgba(15, 15, 35, 0.95) 0%, 
+        rgba(10, 10, 25, 0.98) 100%
+    );
+    backdrop-filter: blur(24px);
     border-right: 1px solid var(--glass-border);
     display: flex;
     flex-direction: column;
@@ -322,6 +591,23 @@ body {
     left: 0;
     bottom: 0;
     z-index: 100;
+    box-shadow: 4px 0 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar glow effect */
+.sidebar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg, 
+        var(--neon-blue), 
+        var(--electric-purple), 
+        var(--neon-cyan)
+    );
+    opacity: 0.3;
 }
 
 .sidebar-header {
@@ -332,10 +618,11 @@ body {
 .sidebar-header h2 {
     font-size: 22px;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, var(--neon-blue), var(--electric-purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
 }
 
 .sidebar-subtitle {
@@ -343,6 +630,7 @@ body {
     color: var(--text-muted);
     display: block;
     margin-top: 2px;
+    letter-spacing: 0.5px;
 }
 
 /* Sidebar Navigation */
@@ -355,23 +643,29 @@ body {
 .nav-item {
     display: flex;
     align-items: center;
-    padding: 16px 24px;
+    padding: 14px 24px;
     color: var(--text-secondary);
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     border-left: 3px solid transparent;
     gap: 14px;
+    margin: 4px 8px;
+    border-radius: var(--radius-md);
 }
 
 .nav-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 212, 255, 0.05);
     color: var(--text-primary);
 }
 
 .nav-item.active {
-    background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, transparent 100%);
-    color: var(--text-primary);
-    border-left-color: var(--primary);
+    background: linear-gradient(90deg, 
+        rgba(0, 212, 255, 0.15) 0%, 
+        rgba(99, 102, 241, 0.1) 100%
+    );
+    color: var(--neon-blue);
+    border-left-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
 }
 
 .nav-icon {
@@ -405,10 +699,10 @@ body {
 .btn-logout {
     width: 100%;
     padding: 12px;
-    background: rgba(255, 71, 87, 0.1);
-    border: 1px solid rgba(255, 71, 87, 0.2);
-    color: var(--danger);
-    border-radius: 10px;
+    background: rgba(255, 55, 95, 0.1);
+    border: 1px solid rgba(255, 55, 95, 0.2);
+    color: var(--neon-pink);
+    border-radius: var(--radius-md);
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -416,12 +710,14 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
+    font-family: inherit;
 }
 
 .btn-logout:hover {
-    background: rgba(255, 71, 87, 0.2);
-    border-color: rgba(255, 71, 87, 0.4);
+    background: rgba(255, 55, 95, 0.2);
+    border-color: rgba(255, 55, 95, 0.4);
+    box-shadow: 0 0 20px rgba(255, 55, 95, 0.2);
 }
 
 /* Mobile Menu Toggle */
@@ -441,7 +737,7 @@ body {
 }
 
 /* =====================================================
-   Main Content
+   Main Content - Futuristic
    ===================================================== */
 
 .main-content {
@@ -454,7 +750,7 @@ body {
 /* Dashboard Sections */
 .dashboard-section {
     display: none;
-    animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.4s ease;
 }
 
 .dashboard-section.active {
@@ -470,6 +766,10 @@ body {
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 8px;
+    background: linear-gradient(135deg, var(--text-primary), var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .section-header .subtitle {
@@ -492,7 +792,7 @@ body {
 }
 
 /* =====================================================
-   Stats Grid
+   Stats Grid - Futuristic Cards
    ===================================================== */
 
 .stats-grid {
@@ -509,19 +809,40 @@ body {
     overflow: hidden;
 }
 
+/* Neon top border effect */
 .stat-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    height: 3px;
+    background: linear-gradient(90deg, var(--neon-blue), var(--electric-purple), var(--neon-cyan));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+/* Animated glow */
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    pointer-events: none;
+}
+
+.stat-card:hover::after {
+    opacity: 1;
 }
 
 .stat-icon {
     font-size: 36px;
     margin-bottom: 12px;
+    filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
 }
 
 .stat-label {
@@ -530,6 +851,7 @@ body {
     letter-spacing: 1px;
     color: var(--text-muted);
     margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .stat-value {
@@ -539,15 +861,17 @@ body {
 }
 
 .stat-value.profit {
-    color: var(--success);
+    color: var(--neon-green);
+    text-shadow: 0 0 20px rgba(48, 209, 88, 0.4);
 }
 
 .stat-value.roi {
-    color: var(--primary);
+    color: var(--neon-cyan);
+    text-shadow: 0 0 20px rgba(0, 245, 212, 0.4);
 }
 
 /* =====================================================
-   Quick Actions
+   Quick Actions - Futuristic
    ===================================================== */
 
 .quick-actions {
@@ -560,18 +884,21 @@ body {
     padding: 28px;
     text-align: center;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
 .quick-action-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+    transform: translateY(-6px);
+    box-shadow: 
+        0 25px 60px rgba(0, 0, 0, 0.4),
+        0 0 40px rgba(0, 212, 255, 0.1);
 }
 
 .qa-icon {
     font-size: 40px;
     display: block;
     margin-bottom: 12px;
+    filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.4));
 }
 
 .qa-text {
@@ -581,7 +908,7 @@ body {
 }
 
 /* =====================================================
-   Investment Tiers
+   Investment Tiers - Futuristic
    ===================================================== */
 
 .tiers-grid {
@@ -594,12 +921,14 @@ body {
     padding: 32px 24px;
     text-align: center;
     position: relative;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
 .tier-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+    box-shadow: 
+        0 30px 70px rgba(0, 0, 0, 0.4),
+        0 0 50px rgba(99, 102, 241, 0.15);
 }
 
 .tier-badge {
@@ -607,7 +936,7 @@ body {
     top: -14px;
     left: 50%;
     transform: translateX(-50%);
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    background: linear-gradient(135deg, var(--neon-blue), var(--primary));
     color: white;
     padding: 8px 20px;
     border-radius: 20px;
@@ -615,29 +944,33 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
 }
 
 .tier-2 .tier-badge {
-    background: linear-gradient(135deg, var(--success), #20bf6b);
+    background: linear-gradient(135deg, var(--neon-green), #20bf6b);
+    box-shadow: 0 4px 15px rgba(48, 209, 88, 0.4);
 }
 
 .tier-3 .tier-badge {
-    background: linear-gradient(135deg, var(--warning), #fa8231);
+    background: linear-gradient(135deg, var(--neon-orange), #fa8231);
+    box-shadow: 0 4px 15px rgba(255, 159, 10, 0.4);
 }
 
 .tier-4 .tier-badge {
-    background: linear-gradient(135deg, var(--secondary), #e84393);
+    background: linear-gradient(135deg, var(--electric-purple), #e84393);
+    box-shadow: 0 4px 15px rgba(191, 90, 242, 0.4);
 }
 
 .tier-roi {
     font-size: 48px;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background: linear-gradient(135deg, var(--neon-blue), var(--electric-purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin: 24px 0 4px;
+    text-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
 }
 
 .tier-roi-label {
@@ -751,13 +1084,63 @@ body {
 }
 
 /* =====================================================
-   Deposit Section
+   Deposit Section - Dual Chain
    ===================================================== */
 
 .deposit-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
+}
+
+/* Network Selection Tabs */
+.network-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.network-tab {
+    flex: 1;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.network-tab:hover {
+    background: rgba(0, 212, 255, 0.05);
+    border-color: rgba(0, 212, 255, 0.2);
+}
+
+.network-tab.active {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.15), rgba(99, 102, 241, 0.1));
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+}
+
+.network-tab-icon {
+    font-size: 32px;
+}
+
+.network-tab-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.network-tab-chain {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .deposit-wallet-card {
@@ -792,9 +1175,10 @@ body {
 .qr-code {
     width: 180px;
     height: 180px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg);
     background: white;
-    padding: 8px;
+    padding: 12px;
+    box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
 }
 
 .wallet-address-container {
@@ -816,7 +1200,7 @@ body {
     gap: 8px;
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     padding: 12px 16px;
 }
 
@@ -829,17 +1213,18 @@ body {
 }
 
 .copy-btn {
-    background: rgba(99, 102, 241, 0.2);
+    background: rgba(0, 212, 255, 0.2);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     padding: 8px 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
     font-size: 16px;
 }
 
 .copy-btn:hover {
-    background: rgba(99, 102, 241, 0.3);
+    background: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
 }
 
 .wallet-notice {
@@ -848,11 +1233,11 @@ body {
     justify-content: center;
     gap: 8px;
     padding: 14px;
-    background: rgba(255, 165, 2, 0.1);
-    border: 1px solid rgba(255, 165, 2, 0.2);
-    border-radius: 10px;
+    background: rgba(255, 159, 10, 0.1);
+    border: 1px solid rgba(255, 159, 10, 0.2);
+    border-radius: var(--radius-md);
     font-size: 13px;
-    color: var(--warning);
+    color: var(--neon-orange);
 }
 
 .notice-icon {
@@ -872,12 +1257,13 @@ body {
 }
 
 .btn-deposit {
-    background: linear-gradient(135deg, var(--success), #20bf6b);
-    box-shadow: 0 4px 15px rgba(46, 213, 115, 0.4);
+    background: linear-gradient(135deg, var(--neon-green), #20bf6b);
+    box-shadow: 0 4px 15px rgba(48, 209, 88, 0.3);
 }
 
 .btn-deposit:hover {
-    box-shadow: 0 8px 25px rgba(46, 213, 115, 0.5);
+    box-shadow: 0 8px 25px rgba(48, 209, 88, 0.4);
+    transform: translateY(-2px);
 }
 
 /* =====================================================
@@ -970,12 +1356,12 @@ body {
 }
 
 .btn-withdraw {
-    background: linear-gradient(135deg, var(--warning), #fa8231);
-    box-shadow: 0 4px 15px rgba(255, 165, 2, 0.4);
+    background: linear-gradient(135deg, var(--neon-orange), #fa8231);
+    box-shadow: 0 4px 15px rgba(255, 159, 10, 0.3);
 }
 
 .btn-withdraw:hover {
-    box-shadow: 0 8px 25px rgba(255, 165, 2, 0.5);
+    box-shadow: 0 8px 25px rgba(255, 159, 10, 0.4);
 }
 
 /* =====================================================
@@ -984,7 +1370,7 @@ body {
 
 .transaction-message {
     padding: 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     margin-top: 20px;
     font-size: 14px;
     text-align: center;
@@ -993,43 +1379,72 @@ body {
 
 .transaction-message.success {
     display: block;
-    background: rgba(46, 213, 115, 0.15);
-    border: 1px solid rgba(46, 213, 115, 0.3);
-    color: var(--success);
+    background: rgba(48, 209, 88, 0.15);
+    border: 1px solid rgba(48, 209, 88, 0.3);
+    color: var(--neon-green);
 }
 
 .transaction-message.error {
     display: block;
-    background: rgba(255, 71, 87, 0.15);
-    border: 1px solid rgba(255, 71, 87, 0.3);
-    color: var(--danger);
+    background: rgba(255, 55, 95, 0.15);
+    border: 1px solid rgba(255, 55, 95, 0.3);
+    color: var(--neon-pink);
 }
 
 /* =====================================================
-   Contact Section
+   Contact Section - Formspree Integration
    ===================================================== */
 
 .contact-card {
     max-width: 500px;
 }
 
-textarea#contact-message {
+.contact-email-direct {
+    margin-top: 24px;
+    padding: 16px;
+    background: rgba(0, 212, 255, 0.05);
+    border: 1px solid rgba(0, 212, 255, 0.1);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.contact-email-direct p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.contact-email-link {
+    color: var(--neon-blue);
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+}
+
+.contact-email-link:hover {
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+
+.formspree-form textarea#contact-message {
     width: 100%;
     padding: 14px 18px;
     font-size: 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
     color: var(--text-primary);
     resize: vertical;
     font-family: inherit;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
-textarea#contact-message:focus {
+.formspree-form textarea#contact-message:focus {
     outline: none;
-    border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--neon-blue);
+    background: rgba(0, 212, 255, 0.05);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.15);
 }
 
 /* =====================================================
@@ -1072,7 +1487,7 @@ textarea#contact-message:focus {
 }
 
 /* =====================================================
-   Status Badges
+   Status Badges - Futuristic
    ===================================================== */
 
 .status-badge {
@@ -1086,23 +1501,47 @@ textarea#contact-message:focus {
 
 .status-active,
 .status-approved {
-    background: rgba(46, 213, 115, 0.2);
-    color: var(--success);
+    background: rgba(48, 209, 88, 0.2);
+    color: var(--neon-green);
+    box-shadow: 0 0 10px rgba(48, 209, 88, 0.2);
 }
 
 .status-pending {
-    background: rgba(255, 165, 2, 0.2);
-    color: var(--warning);
+    background: rgba(255, 159, 10, 0.2);
+    color: var(--neon-orange);
+    box-shadow: 0 0 10px rgba(255, 159, 10, 0.2);
 }
 
 .status-frozen,
 .status-rejected {
-    background: rgba(255, 71, 87, 0.2);
-    color: var(--danger);
+    background: rgba(255, 55, 95, 0.2);
+    color: var(--neon-pink);
+    box-shadow: 0 0 10px rgba(255, 55, 95, 0.2);
+}
+
+/* Chain badges */
+.chain-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chain-badge.bsc {
+    background: rgba(240, 185, 11, 0.2);
+    color: #f0b90b;
+}
+
+.chain-badge.tron {
+    background: rgba(255, 67, 67, 0.2);
+    color: #ff4343;
 }
 
 /* =====================================================
-   Mobile Bottom Navigation
+   Mobile Bottom Navigation - Futuristic
    ===================================================== */
 
 .mobile-bottom-nav {
@@ -1111,11 +1550,12 @@ textarea#contact-message:focus {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(20, 20, 35, 0.98);
-    backdrop-filter: blur(20px);
-    border-top: 1px solid var(--glass-border);
+    background: rgba(15, 15, 35, 0.98);
+    backdrop-filter: blur(24px);
+    border-top: 1px solid rgba(0, 212, 255, 0.1);
     padding: 8px 0;
     z-index: 100;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .mobile-nav-item {
@@ -1126,20 +1566,20 @@ textarea#contact-message:focus {
     padding: 8px;
     color: var(--text-muted);
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all var(--transition-base);
 }
 
 .mobile-nav-item.active {
-    color: var(--primary);
+    color: var(--neon-blue);
 }
 
 .mobile-nav-item.active .mobile-nav-icon {
-    transform: scale(1.1);
+    transform: scale(1.15);
 }
 
 .mobile-nav-icon {
     font-size: 22px;
-    transition: transform 0.3s ease;
+    transition: transform var(--transition-base);
 }
 
 .mobile-nav-text {
@@ -1148,7 +1588,7 @@ textarea#contact-message:focus {
 }
 
 /* =====================================================
-   Responsive Styles
+   Responsive Styles - Futuristic
    ===================================================== */
 
 /* Large Screens */
@@ -1158,14 +1598,60 @@ textarea#contact-message:focus {
     }
 }
 
-/* Tablets */
+/* Tablets - Collapsed Sidebar */
 @media (max-width: 1024px) {
     .sidebar {
-        width: 260px;
+        width: 80px;
+    }
+    
+    .sidebar-header h2,
+    .sidebar-subtitle,
+    .nav-text,
+    .sidebar-footer .user-info,
+    .btn-logout span:not(:first-child) {
+        display: none;
+    }
+    
+    .sidebar-header {
+        padding: 20px 16px;
+        text-align: center;
+    }
+    
+    .sidebar-header h2 {
+        font-size: 20px;
+    }
+    
+    .nav-item {
+        padding: 14px 16px;
+        justify-content: center;
+        margin: 4px 8px;
+        border-left: none;
+        border-radius: var(--radius-md);
+    }
+    
+    .nav-item.active {
+        border-left: none;
+        background: linear-gradient(135deg, 
+            rgba(0, 212, 255, 0.15) 0%, 
+            rgba(99, 102, 241, 0.1) 100%
+        );
+    }
+    
+    .nav-icon {
+        font-size: 24px;
+    }
+    
+    .sidebar-footer {
+        padding: 16px;
+    }
+    
+    .btn-logout {
+        padding: 12px;
+        justify-content: center;
     }
     
     .main-content {
-        margin-left: 260px;
+        margin-left: 80px;
     }
     
     .stats-grid {
@@ -1179,24 +1665,30 @@ textarea#contact-message:focus {
     .deposit-container {
         grid-template-columns: 1fr;
     }
+    
+    .network-tabs {
+        flex-direction: column;
+    }
 }
 
-/* Mobile */
+/* Mobile - Full Sidebar Overlay */
 @media (max-width: 768px) {
     .sidebar {
-        width: 100%;
+        width: 280px;
         position: fixed;
         left: 0;
         top: 0;
         height: 100vh;
         transform: translateX(-100%);
         transition: transform 0.3s ease;
+        z-index: 1000;
     }
     
     .sidebar.mobile-open {
         transform: translateX(0);
     }
     
+    .sidebar.mobile-open ~ .main-content::before,
     .sidebar::before {
         content: '';
         position: fixed;
@@ -1204,13 +1696,31 @@ textarea#contact-message:focus {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.7);
         z-index: -1;
         display: none;
     }
     
     .sidebar.mobile-open::before {
         display: block;
+    }
+    
+    /* Show nav text when sidebar is open on mobile */
+    .sidebar.mobile-open .sidebar-header h2,
+    .sidebar.mobile-open .sidebar-subtitle,
+    .sidebar.mobile-open .nav-text,
+    .sidebar.mobile-open .user-info,
+    .sidebar.mobile-open .btn-logout span:not(:first-child) {
+        display: block;
+    }
+    
+    .sidebar.mobile-open .nav-item {
+        justify-content: flex-start;
+        border-left: 3px solid transparent;
+    }
+    
+    .sidebar.mobile-open .nav-item.active {
+        border-left-color: var(--neon-blue);
     }
     
     .mobile-menu-toggle {
@@ -1270,6 +1780,14 @@ textarea#contact-message:focus {
         align-items: flex-start;
         gap: 12px;
     }
+    
+    .network-tabs {
+        flex-direction: column;
+    }
+    
+    .admin-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* Small Mobile */
@@ -1278,12 +1796,9 @@ textarea#contact-message:focus {
         font-size: 14px;
     }
     
-    .auth-card {
-        padding: 24px;
-    }
-    
+    .auth-card,
     .glass-card {
-        padding: 24px;
+        padding: 20px;
     }
     
     .tier-roi {
@@ -1296,6 +1811,10 @@ textarea#contact-message:focus {
     
     .mobile-nav-text {
         font-size: 10px;
+    }
+    
+    .admin-stats {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1311,5 +1830,19 @@ textarea#contact-message:focus {
     
     .mobile-nav-item {
         padding: 4px 8px;
+    }
+}
+
+/* Ultra-wide screens */
+@media (min-width: 1920px) {
+    .main-content {
+        max-width: 1600px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 48px 64px;
+    }
+    
+    .tiers-grid {
+        grid-template-columns: repeat(4, 1fr);
     }
 }

@@ -201,21 +201,57 @@ window.selectWithdrawalMethod = selectWithdrawalMethod;
 
 /**
  * Copy deposit address to clipboard
+ * Supports dual-chain (BSC and TRC-20)
+ * @param {string} network - The network ('bsc' or 'tron')
  */
-function copyDepositAddress() {
-    const address = document.getElementById('deposit-address').textContent;
+function copyDepositAddress(network = 'bsc') {
+    const addressEl = document.getElementById(`deposit-address-${network}`);
+    if (!addressEl) return;
+    
+    const address = addressEl.textContent;
     navigator.clipboard.writeText(address).then(() => {
-        const copyBtn = document.querySelector('.copy-btn');
-        const originalHTML = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<span>✓</span>';
-        setTimeout(() => {
-            copyBtn.innerHTML = originalHTML;
-        }, 2000);
+        // Find the copy button associated with this address
+        const addressContainer = addressEl.closest('.wallet-address-box');
+        const copyBtn = addressContainer?.querySelector('.copy-btn');
+        if (copyBtn) {
+            const originalHTML = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<span>✓</span>';
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+            }, 2000);
+        }
     });
 }
 
 // Make copyDepositAddress globally available
 window.copyDepositAddress = copyDepositAddress;
+
+/**
+ * Select network for deposit (BSC or TRC-20)
+ * @param {string} network - The network to select ('bsc' or 'tron')
+ */
+function selectNetwork(network) {
+    // Update hidden input
+    const selectedNetworkInput = document.getElementById('selected-network');
+    if (selectedNetworkInput) {
+        selectedNetworkInput.value = network;
+    }
+    
+    // Update tab styles
+    document.querySelectorAll('.network-tab').forEach(tab => {
+        tab.classList.remove('active');
+        if (tab.dataset.network === network) {
+            tab.classList.add('active');
+        }
+    });
+    
+    // Show/hide network info
+    document.getElementById('network-bsc').style.display = network === 'bsc' ? 'block' : 'none';
+    document.getElementById('network-tron').style.display = network === 'tron' ? 'block' : 'none';
+}
+
+// Make selectNetwork globally available
+window.selectNetwork = selectNetwork;
 
 // Form navigation event listeners
 document.getElementById('show-signup')?.addEventListener('click', (e) => {
@@ -487,12 +523,12 @@ function renderActiveInvestments(investments) {
 }
 
 // =====================================================
-// Deposit Function (USDT)
+// Deposit Function (USDT) - Dual Chain Support
 // =====================================================
 
 /**
  * Handle deposit form submission
- * Submits a USDT deposit request with transaction hash
+ * Submits a USDT deposit request with transaction hash and chain info
  */
 document.getElementById('deposit-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -505,8 +541,10 @@ document.getElementById('deposit-form')?.addEventListener('submit', async (e) =>
     
     const amountInput = document.getElementById('deposit-amount');
     const txHashInput = document.getElementById('deposit-txhash');
+    const selectedNetworkInput = document.getElementById('selected-network');
     const amount = parseFloat(amountInput.value);
     const txHash = txHashInput.value.trim();
+    const chain = selectedNetworkInput?.value || 'bsc';
     
     // Validate amount
     if (!amount || isNaN(amount) || amount <= 0) {
@@ -521,10 +559,11 @@ document.getElementById('deposit-form')?.addEventListener('submit', async (e) =>
     }
     
     try {
-        // Call the request_deposit RPC function
+        // Call the request_deposit RPC function with chain parameter
         const { data, error } = await supabase.rpc('request_deposit', {
             amount: amount,
-            tx_hash: txHash
+            tx_hash: txHash,
+            chain: chain
         });
         
         if (error) {
@@ -557,7 +596,7 @@ function showDepositMessage(message, type) {
 }
 
 /**
- * Load user's deposit history
+ * Load user's deposit history with chain information
  */
 async function loadDepositHistory() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -583,6 +622,7 @@ async function loadDepositHistory() {
             <div class="history-item">
                 <div class="history-info">
                     <span class="history-amount">$${parseFloat(deposit.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                    <span class="chain-badge ${deposit.chain || 'bsc'}">${(deposit.chain || 'bsc').toUpperCase()}</span>
                     <span class="history-date">${new Date(deposit.created_at).toLocaleDateString()}</span>
                 </div>
                 <span class="status-badge status-${deposit.status}">${deposit.status}</span>
@@ -1044,6 +1084,62 @@ async function checkSession() {
         navigateTo('home');
     }
 }
+
+// =====================================================
+// Contact Form - Formspree Integration
+// =====================================================
+
+/**
+ * Handle Formspree contact form submission
+ * Shows success/error messages based on submission result
+ */
+document.getElementById('contact-form')?.addEventListener('submit', async (e) => {
+    const form = e.target;
+    const successEl = document.getElementById('contact-form-success');
+    const errorEl = document.getElementById('contact-form-error');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    // Hide previous messages
+    if (successEl) successEl.style.display = 'none';
+    if (errorEl) errorEl.style.display = 'none';
+    
+    // Show loading state
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            // Success
+            if (successEl) {
+                successEl.style.display = 'block';
+            }
+            form.reset();
+        } else {
+            // Error from Formspree
+            if (errorEl) {
+                errorEl.style.display = 'block';
+            }
+        }
+    } catch (error) {
+        // Network error
+        if (errorEl) {
+            errorEl.style.display = 'block';
+        }
+    } finally {
+        // Restore button state
+        submitBtn.textContent = originalBtnText;
+        submitBtn.disabled = false;
+    }
+});
 
 // Start the app
 checkSession();
