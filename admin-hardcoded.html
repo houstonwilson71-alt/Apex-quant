@@ -750,9 +750,15 @@
             const tbody = document.getElementById('users-table-body');
             
             try {
-                const { data: users, error } = await supabase.rpc('get_admin_users');
+                console.log('[Admin] Loading all users via RPC...');
+                const { data: users, error } = await supabase.rpc('get_all_users');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Users loaded:', users?.length || 0);
                 
                 loading.classList.add('hidden');
                 table.classList.remove('hidden');
@@ -764,24 +770,24 @@
                 
                 tbody.innerHTML = users.map(user => `
                     <tr>
-                        <td>${user.user_email || 'N/A'}</td>
-                        <td>$${parseFloat(user.user_balance || 0).toLocaleString()}</td>
-                        <td><span class="status-badge status-${user.user_status || 'active'}">${user.user_status || 'active'}</span></td>
-                        <td>${user.user_is_admin ? '✅' : '❌'}</td>
-                        <td>${user.user_created_at ? new Date(user.user_created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td>${user.email || 'N/A'}</td>
+                        <td>$${parseFloat(user.balance || 0).toLocaleString()}</td>
+                        <td><span class="status-badge status-${user.status || 'active'}">${user.status || 'active'}</span></td>
+                        <td>${user.is_admin ? '✅' : '❌'}</td>
+                        <td>${user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</td>
                         <td>
-                            ${user.user_status === 'frozen' 
-                                ? `<button class="action-btn btn-unfreeze" onclick="unfreezeUser('${user.user_id}')">Unfreeze</button>`
-                                : `<button class="action-btn btn-freeze" onclick="freezeUser('${user.user_id}')">Freeze</button>`
+                            ${user.status === 'frozen' 
+                                ? `<button class="action-btn btn-unfreeze" onclick="unfreezeUser('${user.id}')">Unfreeze</button>`
+                                : `<button class="action-btn btn-freeze" onclick="freezeUser('${user.id}')">Freeze</button>`
                             }
-                            <button class="action-btn btn-adjust" onclick="openAdjustModal('${user.user_id}', '${user.user_email}', ${user.user_balance || 0})">Adjust</button>
+                            <button class="action-btn btn-adjust" onclick="openAdjustModal('${user.id}', '${user.email}', ${user.balance || 0})">Adjust</button>
                         </td>
                     </tr>
                 `).join('');
                 
             } catch (err) {
                 console.error('[Admin] Load users error:', err);
-                loading.innerHTML = '<div class="error-text">Error loading users</div>';
+                loading.innerHTML = '<div class="error-text">Error loading users: ' + err.message + '</div>';
             }
         }
         
@@ -795,9 +801,15 @@
             const tbody = document.getElementById('deposits-table-body');
             
             try {
-                const { data: deposits, error } = await supabase.rpc('get_admin_deposits');
+                console.log('[Admin] Loading all deposits via RPC...');
+                const { data: deposits, error } = await supabase.rpc('get_all_deposits');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Deposits loaded:', deposits?.length || 0);
                 
                 loading.classList.add('hidden');
                 table.classList.remove('hidden');
@@ -809,15 +821,15 @@
                 
                 tbody.innerHTML = deposits.map(d => `
                     <tr>
-                        <td>${d.deposit_user_email || 'N/A'}</td>
-                        <td>$${parseFloat(d.deposit_amount || 0).toLocaleString()}</td>
-                        <td style="font-family: monospace; font-size: 12px;">${(d.deposit_transaction_hash || '').substring(0, 12)}...</td>
-                        <td><span class="status-badge status-${d.deposit_status}">${d.deposit_status}</span></td>
-                        <td>${d.deposit_created_at ? new Date(d.deposit_created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td>${d.email || 'N/A'}</td>
+                        <td>$${parseFloat(d.amount || 0).toLocaleString()}</td>
+                        <td style="font-family: monospace; font-size: 12px;">${(d.transaction_hash || '').substring(0, 12)}...</td>
+                        <td><span class="status-badge status-${d.status}">${d.status}</span></td>
+                        <td>${d.created_at ? new Date(d.created_at).toLocaleDateString() : 'N/A'}</td>
                         <td>
-                            ${d.deposit_status === 'pending' ? `
-                                <button class="action-btn btn-approve" onclick="approveDeposit(${d.deposit_id})">Approve</button>
-                                <button class="action-btn btn-reject" onclick="rejectDeposit(${d.deposit_id})">Reject</button>
+                            ${d.status === 'pending' ? `
+                                <button class="action-btn btn-approve" onclick="approveDeposit(${d.id})">Approve</button>
+                                <button class="action-btn btn-reject" onclick="rejectDeposit(${d.id})">Reject</button>
                             ` : '-'}
                         </td>
                     </tr>
@@ -825,7 +837,7 @@
                 
             } catch (err) {
                 console.error('[Admin] Load deposits error:', err);
-                loading.innerHTML = '<div class="error-text">Error loading deposits</div>';
+                loading.innerHTML = '<div class="error-text">Error loading deposits: ' + err.message + '</div>';
             }
         }
         
@@ -839,9 +851,15 @@
             const tbody = document.getElementById('withdrawals-table-body');
             
             try {
-                const { data: withdrawals, error } = await supabase.rpc('get_admin_withdrawals');
+                console.log('[Admin] Loading all withdrawals via RPC...');
+                const { data: withdrawals, error } = await supabase.rpc('get_all_withdrawals');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Withdrawals loaded:', withdrawals?.length || 0);
                 
                 loading.classList.add('hidden');
                 table.classList.remove('hidden');
@@ -853,15 +871,15 @@
                 
                 tbody.innerHTML = withdrawals.map(w => `
                     <tr>
-                        <td>${w.withdrawal_user_email || 'N/A'}</td>
-                        <td>$${parseFloat(w.withdrawal_amount || 0).toLocaleString()}</td>
-                        <td>${w.withdrawal_method}</td>
-                        <td><span class="status-badge status-${w.withdrawal_status}">${w.withdrawal_status}</span></td>
-                        <td>${w.withdrawal_created_at ? new Date(w.withdrawal_created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td>${w.email || 'N/A'}</td>
+                        <td>$${parseFloat(w.amount || 0).toLocaleString()}</td>
+                        <td>${w.method}</td>
+                        <td><span class="status-badge status-${w.status}">${w.status}</span></td>
+                        <td>${w.created_at ? new Date(w.created_at).toLocaleDateString() : 'N/A'}</td>
                         <td>
-                            ${w.withdrawal_status === 'pending' ? `
-                                <button class="action-btn btn-approve" onclick="approveWithdrawal(${w.withdrawal_id})">Approve</button>
-                                <button class="action-btn btn-reject" onclick="rejectWithdrawal(${w.withdrawal_id})">Reject</button>
+                            ${w.status === 'pending' ? `
+                                <button class="action-btn btn-approve" onclick="approveWithdrawal(${w.id})">Approve</button>
+                                <button class="action-btn btn-reject" onclick="rejectWithdrawal(${w.id})">Reject</button>
                             ` : '-'}
                         </td>
                     </tr>
@@ -869,7 +887,7 @@
                 
             } catch (err) {
                 console.error('[Admin] Load withdrawals error:', err);
-                loading.innerHTML = '<div class="error-text">Error loading withdrawals</div>';
+                loading.innerHTML = '<div class="error-text">Error loading withdrawals: ' + err.message + '</div>';
             }
         }
         
@@ -883,9 +901,15 @@
             const tbody = document.getElementById('investments-table-body');
             
             try {
-                const { data: investments, error } = await supabase.rpc('get_admin_investments');
+                console.log('[Admin] Loading all investments via RPC...');
+                const { data: investments, error } = await supabase.rpc('get_all_investments');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Investments loaded:', investments?.length || 0);
                 
                 loading.classList.add('hidden');
                 table.classList.remove('hidden');
@@ -897,19 +921,19 @@
                 
                 tbody.innerHTML = investments.map(i => `
                     <tr>
-                        <td>${i.investment_user_email || 'N/A'}</td>
-                        <td>Tier ${i.investment_tier}</td>
-                        <td>$${parseFloat(i.investment_amount || 0).toLocaleString()}</td>
-                        <td>${i.investment_roi_percentage}%</td>
-                        <td>$${parseFloat(i.investment_profit || 0).toLocaleString()}</td>
-                        <td><span class="status-badge status-${i.investment_status}">${i.investment_status}</span></td>
-                        <td>${i.investment_end_date ? new Date(i.investment_end_date).toLocaleDateString() : 'N/A'}</td>
+                        <td>${i.email || 'N/A'}</td>
+                        <td>Tier ${i.tier}</td>
+                        <td>$${parseFloat(i.amount || 0).toLocaleString()}</td>
+                        <td>${i.roi_percentage}%</td>
+                        <td>$${parseFloat(i.profit || 0).toLocaleString()}</td>
+                        <td><span class="status-badge status-${i.status}">${i.status}</span></td>
+                        <td>${i.end_date ? new Date(i.end_date).toLocaleDateString() : 'N/A'}</td>
                     </tr>
                 `).join('');
                 
             } catch (err) {
                 console.error('[Admin] Load investments error:', err);
-                loading.innerHTML = '<div class="error-text">Error loading investments</div>';
+                loading.innerHTML = '<div class="error-text">Error loading investments: ' + err.message + '</div>';
             }
         }
         
