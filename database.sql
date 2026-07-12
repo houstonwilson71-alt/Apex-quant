@@ -195,7 +195,19 @@ END;
 $$;
 
 CREATE EXTENSION IF NOT EXISTS pg_cron;
-SELECT cron.unschedule('process-investments');
+DO $$
+DECLARE
+  v_jobid bigint;
+BEGIN
+  SELECT jobid INTO v_jobid
+  FROM cron.job
+  WHERE jobname = 'process-investments';
+
+  IF v_jobid IS NOT NULL THEN
+    PERFORM cron.unschedule(v_jobid);
+  END IF;
+END $$;
+
 SELECT cron.schedule('process-investments', '*/5 * * * *', 'SELECT process_mature_investments()');
 
 CREATE OR REPLACE FUNCTION request_deposit(amount NUMERIC, tx_hash TEXT, chain TEXT)
