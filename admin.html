@@ -707,10 +707,16 @@
          */
         async function loadOverviewStats() {
             try {
+                console.log('[Admin] Loading overview stats via RPC...');
                 // Use RPC function for admin overview stats
                 const { data: stats, error } = await supabase.rpc('get_admin_overview_stats');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error loading overview stats:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Overview stats loaded:', stats);
                 
                 const statsData = stats && stats[0] ? stats[0] : {
                     total_users: 0,
@@ -732,7 +738,7 @@
                 await loadRecentActivity();
                 
             } catch (error) {
-                console.error('Error loading overview:', error);
+                console.error('[Admin] Error loading overview:', error);
             }
         }
         
@@ -741,11 +747,23 @@
          */
         async function loadRecentActivity() {
             try {
+                console.log('[Admin] Loading recent activity via RPC...');
                 // Get recent deposits via RPC
-                const { data: recentDeposits } = await supabase.rpc('get_recent_deposits', { limit_count: 10 });
+                const { data: recentDeposits, error: depositsError } = await supabase.rpc('get_recent_deposits', { limit_count: 10 });
+                
+                if (depositsError) {
+                    console.error('[Admin] RPC Error loading recent deposits:', depositsError);
+                }
                 
                 // Get recent withdrawals via RPC
-                const { data: recentWithdrawals } = await supabase.rpc('get_recent_withdrawals', { limit_count: 10 });
+                const { data: recentWithdrawals, error: withdrawalsError } = await supabase.rpc('get_recent_withdrawals', { limit_count: 10 });
+                
+                if (withdrawalsError) {
+                    console.error('[Admin] RPC Error loading recent withdrawals:', withdrawalsError);
+                }
+                
+                console.log('[Admin] Recent deposits:', recentDeposits?.length || 0);
+                console.log('[Admin] Recent withdrawals:', recentWithdrawals?.length || 0);
                 
                 // Combine and sort
                 const activities = [
@@ -799,9 +817,15 @@
          */
         async function loadUsers() {
             try {
+                console.log('[Admin] Loading users via RPC...');
                 const { data: users, error } = await supabase.rpc('get_all_users');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error loading users:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Users loaded:', users?.length || 0, 'records');
                 
                 const tbody = document.getElementById('users-table-body');
                 
@@ -827,9 +851,9 @@
                 `).join('');
                 
             } catch (error) {
-                console.error('Error loading users:', error);
+                console.error('[Admin] Error loading users:', error);
                 document.getElementById('users-table-body').innerHTML = 
-                    '<tr><td colspan="5" class="empty-state">Error loading users</td></tr>';
+                    '<tr><td colspan="5" class="empty-state">Error loading users: ' + (error.message || 'Unknown error') + '</td></tr>';
             }
         }
         
@@ -945,9 +969,15 @@
          */
         async function loadDeposits() {
             try {
+                console.log('[Admin] Loading deposits via RPC...');
                 const { data: deposits, error } = await supabase.rpc('get_all_deposits');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error loading deposits:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Deposits loaded:', deposits?.length || 0, 'records');
                 
                 const tbody = document.getElementById('deposits-table-body');
                 
@@ -975,9 +1005,9 @@
                 `).join('');
                 
             } catch (error) {
-                console.error('Error loading deposits:', error);
+                console.error('[Admin] Error loading deposits:', error);
                 document.getElementById('deposits-table-body').innerHTML = 
-                    '<tr><td colspan="6" class="empty-state">Error loading deposits</td></tr>';
+                    '<tr><td colspan="6" class="empty-state">Error loading deposits: ' + (error.message || 'Unknown error') + '</td></tr>';
             }
         }
         
@@ -1032,9 +1062,15 @@
          */
         async function loadWithdrawals() {
             try {
+                console.log('[Admin] Loading withdrawals via RPC...');
                 const { data: withdrawals, error } = await supabase.rpc('get_all_withdrawals');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error loading withdrawals:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Withdrawals loaded:', withdrawals?.length || 0, 'records');
                 
                 const tbody = document.getElementById('withdrawals-table-body');
                 
@@ -1085,9 +1121,9 @@
                 }).join('');
                 
             } catch (error) {
-                console.error('Error loading withdrawals:', error);
+                console.error('[Admin] Error loading withdrawals:', error);
                 document.getElementById('withdrawals-table-body').innerHTML = 
-                    '<tr><td colspan="7" class="empty-state">Error loading withdrawals</td></tr>';
+                    '<tr><td colspan="7" class="empty-state">Error loading withdrawals: ' + (error.message || 'Unknown error') + '</td></tr>';
             }
         }
         
@@ -1142,9 +1178,15 @@
          */
         async function loadInvestments() {
             try {
+                console.log('[Admin] Loading investments via RPC...');
                 const { data: investments, error } = await supabase.rpc('get_all_investments');
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('[Admin] RPC Error loading investments:', error);
+                    throw error;
+                }
+                
+                console.log('[Admin] Investments loaded:', investments?.length || 0, 'records');
                 
                 const tbody = document.getElementById('investments-table-body');
                 
@@ -1167,9 +1209,9 @@
                 `).join('');
                 
             } catch (error) {
-                console.error('Error loading investments:', error);
+                console.error('[Admin] Error loading investments:', error);
                 document.getElementById('investments-table-body').innerHTML = 
-                    '<tr><td colspan="8" class="empty-state">Error loading investments</td></tr>';
+                    '<tr><td colspan="8" class="empty-state">Error loading investments: ' + (error.message || 'Unknown error') + '</td></tr>';
             }
         }
         
@@ -1185,24 +1227,35 @@
          * Check if user is admin and show appropriate view
          */
         async function checkAdminAccess() {
+            console.log('[Admin] Checking admin access...');
             const { data: { session } } = await supabase.auth.getSession();
             
             if (!session?.user) {
+                console.log('[Admin] No session found');
                 adminAuthContainer.classList.remove('hidden');
                 adminDashboardContainer.classList.add('hidden');
                 accessDeniedContainer.classList.add('hidden');
                 return;
             }
             
+            console.log('[Admin] Session found for:', session.user.email);
+            
             // Check if user is admin
-            const { data: profile } = await supabase
+            const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('is_admin, status')
                 .eq('id', session.user.id)
                 .single();
             
+            if (profileError) {
+                console.error('[Admin] Error fetching profile:', profileError);
+            }
+            
+            console.log('[Admin] Profile data:', profile);
+            
             if (profile?.is_admin && profile?.status !== 'frozen') {
                 // Admin user - show dashboard
+                console.log('[Admin] Access granted - showing dashboard');
                 adminAuthContainer.classList.add('hidden');
                 adminDashboardContainer.classList.remove('hidden');
                 accessDeniedContainer.classList.add('hidden');
@@ -1212,6 +1265,7 @@
                 loadOverviewStats();
             } else {
                 // Not admin or frozen
+                console.log('[Admin] Access denied - not admin or frozen');
                 adminAuthContainer.classList.add('hidden');
                 adminDashboardContainer.classList.add('hidden');
                 accessDeniedContainer.classList.remove('hidden');
