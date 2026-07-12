@@ -401,31 +401,6 @@
                         <h3 style="color: white; margin-bottom: 20px;">Your Deposit History</h3>
                         <div id="deposit-history" style="margin-top:30px;"></div>
                     </div>
-                    <script>
-                      window.addEventListener('load', () => {
-                        setTimeout(async () => {
-                          const { data: { user } } = await supabase.auth.getUser();
-                          if (!user) return;
-                          const { data: deposits } = await supabase
-                            .from('deposits')
-                            .select('*')
-                            .eq('user_id', user.id)
-                            .order('created_at', { ascending: false });
-                          
-                          const container = document.getElementById('deposit-history');
-                          if (!deposits || deposits.length === 0) {
-                            container.innerHTML = '<p style="color:#aaa;">No deposits yet.</p>';
-                          } else {
-                            container.innerHTML = deposits.map(d => 
-                              `<div style="background:rgba(255,255,255,0.05);padding:10px;margin:5px 0;border-radius:8px;">
-                                <strong>$${d.amount}</strong> - ${d.chain?.toUpperCase()} - 
-                                <span style="color:${d.status==='approved'?'#0f0':d.status==='rejected'?'#f00':'#ff0'}">${d.status}</span>
-                              </div>`
-                            ).join('');
-                          }
-                        }, 1500);
-                      });
-                    </script>
                 </section>
 
                 <!-- Withdraw Section -->
@@ -523,31 +498,6 @@
                         <h3 style="color: white; margin-bottom: 20px;">Your Withdrawal History</h3>
                         <div id="withdrawal-history" style="margin-top:30px;"></div>
                     </div>
-                    <script>
-                      window.addEventListener('load', () => {
-                        setTimeout(async () => {
-                          const { data: { user } } = await supabase.auth.getUser();
-                          if (!user) return;
-                          const { data: withdrawals } = await supabase
-                            .from('withdrawals')
-                            .select('*')
-                            .eq('user_id', user.id)
-                            .order('created_at', { ascending: false });
-                          
-                          const container = document.getElementById('withdrawal-history');
-                          if (!withdrawals || withdrawals.length === 0) {
-                            container.innerHTML = '<p style="color:#aaa;">No withdrawals yet.</p>';
-                          } else {
-                            container.innerHTML = withdrawals.map(w => 
-                              `<div style="background:rgba(255,255,255,0.05);padding:10px;margin:5px 0;border-radius:8px;">
-                                <strong>$${w.amount}</strong> - ${w.method} - 
-                                <span style="color:${w.status==='approved'?'#0f0':w.status==='rejected'?'#f00':'#ff0'}">${w.status}</span>
-                              </div>`
-                            ).join('');
-                          }
-                        }, 1500);
-                      });
-                    </script>
                 </section>
 
                 <!-- Contact Support Section -->

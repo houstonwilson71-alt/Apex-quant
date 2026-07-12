@@ -532,6 +532,66 @@ async function loadDepositHistory() {
 window.loadDepositHistory = loadDepositHistory;
 
 // =====================================================
+// WITHDRAWAL HISTORY
+// =====================================================
+async function loadWithdrawalHistory() {
+    const container = document.getElementById('withdrawal-history');
+    if (!container) {
+        console.error('loadWithdrawalHistory: container #withdrawal-history not found');
+        return;
+    }
+
+    try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+            container.innerHTML = '<p style="color:red;">Auth error: ' + userError.message + '</p>';
+            return;
+        }
+        if (!user) {
+            container.innerHTML = '<p style="color:orange;">Please log in to see your withdrawals.</p>';
+            return;
+        }
+
+        const { data: withdrawals, error } = await supabase
+            .from('withdrawals')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            container.innerHTML = '<p style="color:red;">❌ Error: ' + error.message + ' (Code: ' + error.code + ')</p>';
+            console.error('Withdrawal fetch error:', error);
+            return;
+        }
+
+        if (!withdrawals || withdrawals.length === 0) {
+            container.innerHTML = '<p style="color:#aaa;">No withdrawal transactions yet.</p>';
+            return;
+        }
+
+        let html = '<table style="width:100%;border-collapse:collapse;margin-top:10px;color:#fff;">';
+        html += '<thead><tr><th>Amount</th><th>Method</th><th>Status</th><th>Date</th></tr></thead><tbody>';
+        withdrawals.forEach(w => {
+            const statusColor = w.status === 'approved' ? '#00cc66' : w.status === 'rejected' ? '#ff4444' : '#ffaa00';
+            html += '<tr>' +
+                '<td>$' + w.amount + '</td>' +
+                '<td>' + (w.method ? w.method.charAt(0).toUpperCase() + w.method.slice(1) : 'N/A') + '</td>' +
+                '<td style="color:' + statusColor + ';font-weight:bold;">' + w.status.toUpperCase() + '</td>' +
+                '<td>' + new Date(w.created_at).toLocaleDateString() + '</td>' +
+                '</tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+    } catch (err) {
+        container.innerHTML = '<p style="color:red;">⚠️ Unexpected error: ' + err.message + '</p>';
+        console.error('loadWithdrawalHistory exception:', err);
+    }
+}
+
+window.loadWithdrawalHistory = loadWithdrawalHistory;
+
+// =====================================================
 // Withdraw Function
 // =====================================================
 
