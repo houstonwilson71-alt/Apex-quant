@@ -1252,6 +1252,17 @@ a:hover {
   min-height: 100vh;
 }
 
+/* Center main dashboard content so panels (deposit, withdraw,
+   leaderboard, tiers, etc.) appear visually centered in the page
+   while keeping the fixed sidebar on the left. */
+.main-content > * {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .dashboard-section {
   display: none;
 }
@@ -1598,7 +1609,44 @@ a:hover {
 .tier-1 .tier-badge { background: var(--glow-cyan); color: var(--bg-void); }
 .tier-2 .tier-badge { background: var(--glow-purple); color: white; }
 .tier-3 .tier-badge { background: var(--glow-pink); color: white; }
+
 .tier-4 .tier-badge { background: var(--glow-gold); color: var(--bg-void); }
+
+/* Tier input group - make amount input wide and easy to use */
+.tier-input-group {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+  margin-top: var(--space-md);
+}
+
+.tier-input-group input[type="number"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 12px 14px;
+  font-size: 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(0,0,0,0.35);
+  border: 1px solid var(--border-glow);
+  color: var(--text-primary);
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+}
+
+.tier-input-group input[type="number"]::placeholder {
+  color: var(--text-muted);
+}
+
+.tier-input-group .btn {
+  flex: 0 0 auto;
+  min-width: 120px;
+}
+
+/* Make calculator input slightly narrower on very small screens */
+@media (max-width: 480px) {
+  .calculator-input-wrapper { max-width: 320px; }
+  .tier-input-group .btn { min-width: 100px; }
+}
 
 .tier-roi-display {
   font-size: 3.5rem;
