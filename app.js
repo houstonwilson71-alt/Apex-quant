@@ -98,7 +98,7 @@ function setAuthenticatedView(isAuthenticated) {
 }
 
 function navigateTo(sectionId) {
-  const sectionIds = ['home', 'trading-ai', 'deposit', 'withdraw', 'history', 'contact'];
+  const sectionIds = ['home', 'trading-ai', 'calculator', 'leaderboard', 'deposit', 'withdraw', 'history', 'contact'];
   sectionIds.forEach(id => {
     const section = document.getElementById(`section-${id}`);
     if (section) section.classList.remove('active');
@@ -125,6 +125,16 @@ function navigateTo(sectionId) {
   // Refresh countdown timers when navigating to trading-ai
   if (sectionId === 'trading-ai') {
     startCountdownTimers();
+  }
+  
+  // Initialize calculator when navigating to calculator section
+  if (sectionId === 'calculator') {
+    initCalculator();
+  }
+  
+  // Regenerate leaderboard when navigating to leaderboard section
+  if (sectionId === 'leaderboard') {
+    generateLeaderboard();
   }
 }
 
@@ -1455,6 +1465,283 @@ function renderAdminInvestments(investments) {
     </div>
   `;
 }
+
+// ========== CALCULATOR ==========
+
+function initCalculator() {
+  const input = document.getElementById('calculator-amount');
+  if (!input) return;
+  
+  // Set initial value
+  input.value = input.value || '1000';
+  
+  // Add event listener for real-time updates
+  input.addEventListener('input', updateCalculator);
+  
+  // Initial calculation
+  updateCalculator();
+}
+
+function updateCalculator() {
+  const amount = parseFloat(document.getElementById('calculator-amount')?.value) || 0;
+  
+  // Update each tier
+  [1, 2, 3, 4].forEach(tier => {
+    const roiPercent = tier === 1 ? 100 : tier === 2 ? 150 : tier === 3 ? 200 : 300;
+    const profit = amount * (roiPercent / 100);
+    const total = amount + profit;
+    
+    const profitEl = document.getElementById(`calc-tier${tier}-profit`);
+    const totalEl = document.getElementById(`calc-tier${tier}-total`);
+    
+    if (profitEl) profitEl.textContent = formatCurrency(profit);
+    if (totalEl) totalEl.textContent = formatCurrency(total);
+    
+    // Update bar widths based on ROI
+    const card = document.querySelector(`.calc-tier-card[data-tier="${tier}"]`);
+    const bar = card?.querySelector('.calc-bar');
+    if (bar) {
+      const maxRoi = 300;
+      const percentage = (roiPercent / maxRoi) * 100;
+      bar.style.width = `${percentage}%`;
+    }
+  });
+}
+
+function investFromCalculator(tier) {
+  const amount = document.getElementById('calculator-amount')?.value || '1000';
+  
+  // Navigate to trading AI section
+  navigateTo('trading-ai');
+  
+  // Pre-fill the investment amount after navigation
+  setTimeout(() => {
+    const amountInput = document.getElementById('investment-amount');
+    if (amountInput) {
+      amountInput.value = amount;
+      amountInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    
+    // Select the tier
+    const tierBtn = document.querySelector(`.tier-btn[data-tier="${tier}"]`);
+    if (tierBtn) {
+      tierBtn.click();
+    }
+  }, 100);
+}
+
+window.investFromCalculator = investFromCalculator;
+
+// ========== LEADERBOARD ==========
+
+const COUNTRIES = [
+  { name: 'USA', flag: '🇺🇸', names: ['Michael Johnson', 'David Williams', 'James Brown', 'Robert Garcia', 'William Martinez', 'Christopher Lee', 'Daniel Anderson', 'Matthew Taylor', 'Anthony Thomas', 'Joshua Jackson', 'Andrew White', 'Joseph Harris'] },
+  { name: 'UK', flag: '🇬🇧', names: ['Oliver Smith', 'Harry Jones', 'Jack Davies', 'George Wilson', 'William Brown', 'Thomas Taylor', 'James Evans', 'Ryan Thomas', 'Samuel Roberts', 'Benjamin Walker', 'Sebastian Green'] },
+  { name: 'Germany', flag: '🇩🇪', names: ['Hans Mueller', 'Peter Schmidt', 'Klaus Weber', 'Wolfgang Wagner', 'Heinrich Fischer', 'Karl Becker', 'Dieter Hoffmann', 'Werner Schulz', 'Gerd Lange', 'Rolf Braun'] },
+  { name: 'Brazil', flag: '🇧🇷', names: ['Lucas Silva', 'Gabriel Santos', 'Arthur Oliveira', 'Pedro Costa', 'Matheus Lima', 'Gustavo Souza', 'Rafael Carvalho', 'Felipe Alves', 'Bruno Ribeiro', 'Vinicius Pereira'] },
+  { name: 'China', flag: '🇨🇳', names: ['Wei Chen', 'Ming Li', 'Jian Zhang', 'Hui Wang', 'Jun Liu', 'Bo Yang', 'Lei Huang', 'Feng Guo', 'Kai Lin', 'Jin Zhou'] },
+  { name: 'Japan', flag: '🇯🇵', names: ['Yuki Tanaka', 'Haruto Yamamoto', 'Sota Watanabe', 'Riku Suzuki', 'Sora Takahashi', 'Ren Ito', 'Kaito Kobayashi', 'Arata Kato', 'Haruki Yamamoto', 'Yuma Sasaki'] },
+  { name: 'UAE', flag: '🇦🇪', names: ['Ahmed Al-Rashid', 'Khalid Mohammed', 'Omar Hassan', 'Hassan Ibrahim', 'Ali Al-Mansoor', 'Rashid Al-Zaher', 'Saeed Al-Qasimi', 'Majid Al-Ain'] },
+  { name: 'Nigeria', flag: '🇳🇬', names: ['Chukwuemeka Okonkwo', 'Oluwaseun Adeyemi', 'Babajide Oluwatobi', 'Emeka Nwachukwu', 'Ayomide Bakare', 'Olumide Samuel', 'Tochukwu Eze', 'Adesuwa Osei'] },
+  { name: 'Canada', flag: '🇨🇦', names: ['James MacDonald', 'William Tremblay', 'Benjamin Smith', 'Noah Lavoie', 'Liam Gagnon', 'Nathan Leblanc', 'Mason Bouchard', 'Ethan Fortin'] },
+  { name: 'Australia', flag: '🇦🇺', names: ['Oliver Jones', 'William Brown', 'Jack Wilson', 'Thomas Anderson', 'James Thompson', 'Alexander Cameron', 'Harry Mitchell', 'Maxwell Parker'] },
+  { name: 'South Korea', flag: '🇰🇷', names: ['Min-jun Kim', 'Seo-yeon Park', 'Hye-ji Choi', 'Jun-ho Lee', 'Soo-ah Kang', 'Dong-hyun Kim', 'Ji-woo Choi', 'Min-kyu Shin'] },
+  { name: 'India', flag: '🇮🇳', names: ['Raj Patel', 'Amit Sharma', 'Vikram Singh', 'Arjun Nair', 'Ravi Kumar', 'Sanjay Gupta', 'Priya Sharma', 'Neha Kapoor', 'Ankit Verma', 'Rahul Mehta'] },
+  { name: 'France', flag: '🇫🇷', names: ['Lucas Bernard', 'Hugo Dubois', 'Raphael Laurent', 'Arthur Petit', 'Louis Moreau', 'Gabriel Garcia', 'Nathan Martinez', 'Pierre Dupont'] },
+  { name: 'Singapore', flag: '🇸🇬', names: ['Wei Ming Tan', 'Jun Wei Lee', 'Zhi Xuan Chee', 'Kai Liang Goh', 'Yi Jie Chong', 'Jun Hao Lim', 'Xuan Long Phua', 'Jia Le Ang'] },
+  { name: 'Switzerland', flag: '🇨🇭', names: ['Lukas Weber', 'Felix Muller', 'Noah Keller', 'Liam Steiner', 'Elias Fischer', 'Julian Brunner', 'Leo Gerber', 'Nils Hoffmann'] },
+  { name: 'Saudi Arabia', flag: '🇸🇦', names: ['Fahad Al-Otaibi', 'Khalid Al-Saud', 'Ahmed Al-Mutairi', 'Saud Al-Harbi', 'Mansour Al-Blushi', 'Abdulaziz Al-Dosari', 'Nasser Al-Eissa', 'Talal Al-Ghanim'] }
+];
+
+function randomInRange(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomDate() {
+  const now = new Date();
+  const past = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+  return new Date(past.getTime() + Math.random() * (now.getTime() - past.getTime()));
+}
+
+function generateLeaderboard() {
+  const tbody = document.getElementById('leaderboard-body');
+  if (!tbody) return;
+  
+  // Generate 50 random investors
+  const investors = [];
+  
+  for (let i = 0; i < 50; i++) {
+    const countryData = COUNTRIES[randomInRange(0, COUNTRIES.length - 1)];
+    const name = countryData.names[randomInRange(0, countryData.names.length - 1)];
+    const deposited = randomInRange(200, 400000);
+    const withdrawn = randomInRange(500, 500000);
+    const profit = randomInRange(100, 150000);
+    const joinDate = randomDate();
+    
+    investors.push({
+      rank: i + 1,
+      name,
+      country: countryData.name,
+      flag: countryData.flag,
+      deposited,
+      withdrawn,
+      profit,
+      joined: joinDate
+    });
+  }
+  
+  // Sort by profit descending
+  investors.sort((a, b) => b.profit - a.profit);
+  
+  // Re-assign ranks after sorting
+  investors.forEach((inv, idx) => inv.rank = idx + 1);
+  
+  // Update user position if they're logged in
+  updateUserPosition(investors);
+  
+  // Render table
+  tbody.innerHTML = investors.map(inv => {
+    const medal = inv.rank === 1 ? '🥇' : inv.rank === 2 ? '🥈' : inv.rank === 3 ? '🥉' : '';
+    const topClass = inv.rank <= 10 ? 'top-10' : '';
+    
+    return `
+      <tr class="${topClass}">
+        <td class="rank-cell">
+          ${medal ? `<span class="rank-medal">${medal}</span>` : `<span class="rank-number">#${inv.rank}</span>`}
+        </td>
+        <td class="investor-cell">${escapeHtml(inv.name)}</td>
+        <td class="country-cell">${inv.flag} ${inv.country}</td>
+        <td>${formatCurrency(inv.deposited)}</td>
+        <td>${formatCurrency(inv.withdrawn)}</td>
+        <td class="profit-cell">+${formatCurrency(inv.profit)}</td>
+        <td class="date-cell">${formatDate(inv.joined.toISOString())}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function updateUserPosition(investors) {
+  const positionEl = document.getElementById('user-position-value');
+  if (!positionEl) return;
+  
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      positionEl.textContent = 'Sign in to see your rank';
+      return;
+    }
+    
+    // Calculate user's total profit from their investments
+    const { data: investments } = await supabase
+      .from('investments')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('status', 'completed');
+    
+    if (!investments || investments.length === 0) {
+      positionEl.textContent = 'Start investing to rank!';
+      return;
+    }
+    
+    const userProfit = investments.reduce((sum, inv) => {
+      const amount = Number(inv.amount) || 0;
+      const roi = Number(inv.roi_percentage) || 0;
+      return sum + (amount * (roi / 100));
+    }, 0);
+    
+    // Find user's position in the leaderboard
+    const position = investors.findIndex(inv => inv.profit < userProfit) + 1 || 51;
+    
+    if (position <= 10) {
+      positionEl.textContent = `🎉 You're in the Top 10!`;
+    } else {
+      positionEl.textContent = `~ Rank #${position}`;
+    }
+  } catch (err) {
+    console.error('Error updating user position:', err);
+    positionEl.textContent = 'Start investing to rank!';
+  }
+}
+
+// ========== TESTIMONIAL CAROUSEL ==========
+
+let currentTestimonial = 0;
+let testimonialInterval = null;
+const totalTestimonials = 8;
+
+function initTestimonialCarousel() {
+  const dotsContainer = document.getElementById('testimonial-dots');
+  if (!dotsContainer) return;
+  
+  // Create dots
+  dotsContainer.innerHTML = Array.from({ length: totalTestimonials }, (_, i) => 
+    `<span class="testimonial-dot ${i === 0 ? 'active' : ''}" onclick="goToTestimonial(${i})"></span>`
+  ).join('');
+  
+  // Show first slide
+  showTestimonial(0);
+  
+  // Start auto-rotation
+  startTestimonialAutoRotation();
+  
+  // Pause on hover
+  const carousel = document.querySelector('.testimonials-carousel');
+  if (carousel) {
+    carousel.addEventListener('mouseenter', stopTestimonialAutoRotation);
+    carousel.addEventListener('mouseleave', startTestimonialAutoRotation);
+  }
+}
+
+function showTestimonial(index) {
+  const slides = document.querySelectorAll('.testimonial-slide');
+  const dots = document.querySelectorAll('.testimonial-dot');
+  
+  if (slides.length === 0) return;
+  
+  // Hide all slides
+  slides.forEach(slide => slide.classList.remove('active'));
+  dots.forEach(dot => dot.classList.remove('active'));
+  
+  // Show current slide
+  if (slides[index]) slides[index].classList.add('active');
+  if (dots[index]) dots[index].classList.add('active');
+  
+  currentTestimonial = index;
+}
+
+function changeTestimonial(direction) {
+  let newIndex = currentTestimonial + direction;
+  if (newIndex < 0) newIndex = totalTestimonials - 1;
+  if (newIndex >= totalTestimonials) newIndex = 0;
+  showTestimonial(newIndex);
+}
+
+function goToTestimonial(index) {
+  showTestimonial(index);
+  // Reset auto-rotation timer
+  stopTestimonialAutoRotation();
+  startTestimonialAutoRotation();
+}
+
+function startTestimonialAutoRotation() {
+  stopTestimonialAutoRotation();
+  testimonialInterval = setInterval(() => {
+    changeTestimonial(1);
+  }, 5000);
+}
+
+function stopTestimonialAutoRotation() {
+  if (testimonialInterval) {
+    clearInterval(testimonialInterval);
+    testimonialInterval = null;
+  }
+}
+
+window.changeTestimonial = changeTestimonial;
+window.goToTestimonial = goToTestimonial;
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initTestimonialCarousel);
 
 // ========== BOOT ==========
 
