@@ -892,10 +892,10 @@ async function invest(tier) {
       return;
     }
     
-    const { error } = await supabase.rpc('create_investment', {
+    const { error } = await supabase.rpc('invest', {
       p_user_id: user.id,
-      p_tier: tier,
-      p_amount: amount
+      p_amount: amount,
+      p_tier: tier
     });
     
     if (error) {
@@ -947,11 +947,10 @@ async function handleDepositSubmit(e) {
       return;
     }
     
-    const { error } = await supabase.rpc('submit_deposit', {
-      p_user_id: user.id,
-      p_amount: amount,
-      p_transaction_hash: txHash,
-      p_chain: chain
+    const { error } = await supabase.rpc('request_deposit', {
+      amount: amount,
+      tx_hash: txHash,
+      chain: chain
     });
     
     if (error) {
@@ -1045,10 +1044,9 @@ async function handleWithdrawalSubmit(e) {
     }
     
     const { error } = await supabase.rpc('request_withdrawal', {
-      p_user_id: user.id,
-      p_amount: amount,
-      p_method: currentWithdrawalMethod,
-      p_details: details
+      amount: amount,
+      method: currentWithdrawalMethod,
+      details_json: details
     });
     
     if (error) {
