@@ -7,9 +7,11 @@
   /* High-Tech Color Palette */
   --bg-void: #020510;
   --bg-deep: #0a0f1a;
-  --bg-card: rgba(10, 15, 26, 0.7);
-  --bg-card-hover: rgba(15, 22, 38, 0.85);
-  --bg-sidebar: rgba(5, 8, 20, 0.95);
+  --bg-card: rgba(10, 15, 26, 0.74);
+  --bg-card-hover: rgba(15, 22, 38, 0.9);
+  --bg-sidebar: rgba(5, 8, 20, 0.96);
+  --surface-elevated: rgba(11, 17, 30, 0.9);
+  --surface-soft: rgba(8, 13, 24, 0.78);
   
   /* Neon Glow Colors */
   --glow-cyan: #00f0ff;
@@ -85,11 +87,25 @@ html {
 
 body {
   font-family: 'Plus Jakarta Sans', 'Rajdhani', 'DM Sans', 'Segoe UI', sans-serif;
-  background: var(--bg-void);
+  background:
+    radial-gradient(circle at top left, rgba(0, 240, 255, 0.16), transparent 24%),
+    radial-gradient(circle at 80% 0%, rgba(179, 71, 234, 0.15), transparent 20%),
+    radial-gradient(circle at bottom center, rgba(255, 45, 149, 0.12), transparent 20%),
+    linear-gradient(135deg, #020510 0%, #050914 42%, #03060c 100%);
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.6;
   overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.025) 0%, transparent 20%, transparent 80%, rgba(179, 71, 234, 0.025) 100%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 body[data-page="admin"] {
@@ -415,6 +431,51 @@ a:hover {
   min-height: 100vh;
 }
 
+.hero-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(0px);
+  opacity: 0.55;
+  animation: heroFloat 12s ease-in-out infinite;
+}
+
+.hero-shape.shape-1 {
+  width: 240px;
+  height: 240px;
+  top: 6%;
+  left: 8%;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.18), transparent 70%);
+}
+
+.hero-shape.shape-2 {
+  width: 320px;
+  height: 320px;
+  top: 18%;
+  right: 6%;
+  background: radial-gradient(circle, rgba(179, 71, 234, 0.16), transparent 70%);
+  animation-delay: -4s;
+}
+
+.hero-shape.shape-3 {
+  width: 280px;
+  height: 280px;
+  bottom: 6%;
+  left: 32%;
+  background: radial-gradient(circle, rgba(255, 45, 149, 0.14), transparent 70%);
+  animation-delay: -7s;
+}
+
+@keyframes heroFloat {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(24px, -18px, 0) scale(1.06); }
+}
+
 /* Navigation */
 .landing-nav {
   position: fixed;
@@ -553,6 +614,15 @@ a:hover {
   position: relative;
 }
 
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
 .section-dark {
   background: rgba(0, 0, 0, 0.3);
 }
@@ -582,6 +652,17 @@ a:hover {
   text-align: center;
   padding: var(--space-xl);
   position: relative;
+  overflow: hidden;
+}
+
+.step-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 10% -40px 10%;
+  height: 80px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.16), transparent 70%);
+  filter: blur(22px);
+  pointer-events: none;
 }
 
 .step-number {
@@ -642,6 +723,17 @@ a:hover {
   padding: var(--space-xl);
   position: relative;
   transition: all var(--transition-normal);
+  overflow: hidden;
+}
+
+.tier-preview-card::after {
+  content: '';
+  position: absolute;
+  inset: auto -5% -20% auto;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 70%);
+  pointer-events: none;
 }
 
 .tier-preview-card:hover {
@@ -705,6 +797,15 @@ a:hover {
 .benefit-card {
   text-align: center;
   padding: var(--space-xl);
+  overflow: hidden;
+}
+
+.benefit-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.04), transparent 45%, rgba(179, 71, 234, 0.04));
+  pointer-events: none;
 }
 
 .benefit-icon {
@@ -2700,6 +2801,141 @@ a:hover {
 
 .ticker-coin.flash-down {
   animation: price-flash-down 0.5s ease-out;
+}
+
+/* =========================================
+   PREMIUM ALGO-TRADING VISUAL UPGRADE
+   ========================================= */
+
+.landing-nav {
+  width: calc(100% - 32px);
+  margin: 16px auto 0;
+  border-radius: 22px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35), 0 0 30px rgba(0, 240, 255, 0.08);
+  backdrop-filter: blur(24px);
+  background: linear-gradient(135deg, rgba(2, 5, 16, 0.96), rgba(7, 12, 24, 0.9));
+}
+
+.hero-section {
+  padding: 150px var(--space-xl) 96px;
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.07) 0%, rgba(179, 71, 234, 0.05) 45%, transparent 100%);
+  border-radius: 0 0 36px 36px;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 8% 12% auto;
+  height: 220px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.16), transparent 70%);
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.hero-section::after {
+  content: '';
+  position: absolute;
+  inset: auto 8% 6% 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.5), transparent);
+}
+
+.hero-badge {
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.18);
+}
+
+.hero-title {
+  font-size: clamp(2.6rem, 5vw, 4.4rem);
+  letter-spacing: 0.16em;
+  line-height: 1.08;
+}
+
+.hero-subtitle {
+  max-width: 760px;
+  margin: 0 auto 32px;
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+
+.section {
+  margin: 0 24px 24px;
+  padding: 72px 32px;
+  border-radius: 28px;
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  background: linear-gradient(180deg, rgba(9, 14, 24, 0.82), rgba(4, 8, 16, 0.7));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 16px 45px rgba(0, 0, 0, 0.25);
+}
+
+.glass-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(145deg, rgba(10, 15, 26, 0.95), rgba(6, 10, 20, 0.8));
+  backdrop-filter: blur(24px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.045) 45%, transparent 100%);
+  transform: translateX(-120%);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+
+.glass-card:hover::before {
+  transform: translateX(120%);
+}
+
+.btn {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #09d9ff 0%, #00bfe8 45%, #6d5dfc 100%);
+  color: #020510;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.btn-secondary {
+  box-shadow: 0 0 18px rgba(179, 71, 234, 0.2);
+}
+
+.stat-card,
+.quick-action-card,
+.tier-preview-card,
+.benefit-card,
+.calculator-card,
+.leaderboard-card,
+.contact-card,
+.deposit-card,
+.withdraw-card,
+.history-card,
+.investment-form {
+  background: linear-gradient(145deg, rgba(10, 15, 26, 0.94), rgba(5, 9, 18, 0.82));
+  border: 1px solid rgba(0, 240, 255, 0.16);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sidebar {
+  background: linear-gradient(180deg, rgba(5, 8, 20, 0.98), rgba(3, 6, 16, 0.96));
+  border-right: 1px solid rgba(0, 240, 255, 0.16);
+  box-shadow: 16px 0 40px rgba(0, 0, 0, 0.22);
+}
+
+.crypto-ticker-bar {
+  background: linear-gradient(90deg, rgba(10, 15, 26, 0.98), rgba(7, 11, 22, 0.95));
+  border-bottom: 1px solid rgba(0, 240, 255, 0.16);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.ticker-coin {
+  border: 1px solid rgba(0, 240, 255, 0.14);
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.08), rgba(179, 71, 234, 0.06));
 }
 
 /* =========================================
