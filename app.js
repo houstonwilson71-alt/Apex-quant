@@ -1741,6 +1741,148 @@ window.goToTestimonial = goToTestimonial;
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', initTestimonialCarousel);
 
+// ========== CRYPTO PRICE TICKER ==========
+
+const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,tron,solana&vs_currencies=usd&include_24hr_change=true';
+
+const CRYPTO_DATA = {
+  bitcoin: { symbol: 'BTC', name: 'Bitcoin', icon: '₿' },
+  ethereum: { symbol: 'ETH', name: 'Ethereum', icon: 'Ξ' },
+  binancecoin: { symbol: 'BNB', name: 'BNB', icon: '🔶' },
+  tron: { symbol: 'TRX', name: 'Tron', icon: '🔺' },
+  solana: { symbol: 'SOL', name: 'Solana', icon: '◎' }
+};
+
+const FALLBACK_PRICES = {
+  bitcoin: { usd: 67000, usd_24h_change: 2.5 },
+  ethereum: { usd: 3500, usd_24h_change: 1.8 },
+  binancecoin: { usd: 580, usd_24h_change: 3.2 },
+  tron: { usd: 0.11, usd_24h_change: -0.5 },
+  solana: { usd: 180, usd_24h_change: 4.1 }
+};
+
+let previousPrices = {};
+let tickerInterval = null;
+let isDelayed = false;
+
+function formatPrice(price, symbol) {
+  if (symbol === 'BTC' && price < 100000) {
+    return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  if (price >= 1000) {
+    return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  if (price >= 1) {
+    return '$' + price.toFixed(2);
+  }
+  return '$' + price.toFixed(4);
+}
+
+function formatChange(change) {
+  const sign = change >= 0 ? '▲' : '▼';
+  return `${sign} ${Math.abs(change).toFixed(2)}%`;
+}
+
+function createCoinHTML(coinId, priceData) {
+  const coin = CRYPTO_DATA[coinId];
+  const price = priceData.usd;
+  const change = priceData.usd_24h_change || 0;
+  const isPositive = change >= 0;
+  const changeClass = isPositive ? 'positive' : 'negative';
+  
+  // Check for price change animation
+  const prevPrice = previousPrices[coinId];
+  let flashClass = '';
+  if (prevPrice !== undefined && prevPrice !== price) {
+    flashClass = price > prevPrice ? 'flash-up' : 'flash-down';
+  }
+  previousPrices[coinId] = price;
+  
+  return `
+    <div class="ticker-coin ${flashClass}" data-coin="${coinId}">
+      <span class="ticker-coin-icon">${coin.icon}</span>
+      <div class="ticker-coin-info">
+        <span class="ticker-coin-symbol">${coin.symbol}</span>
+        <span class="ticker-coin-price">${formatPrice(price, coin.symbol)}</span>
+        <span class="ticker-coin-change ${changeClass}">${formatChange(change)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function updateTickers(priceData) {
+  const landingTicker = document.getElementById('landing-ticker');
+  const dashboardTicker = document.getElementById('dashboard-ticker');
+  
+  const coinsHTML = Object.keys(CRYPTO_DATA).map(coinId => 
+    createCoinHTML(coinId, priceData[coinId] || FALLBACK_PRICES[coinId])
+  ).join('');
+  
+  if (landingTicker) {
+    landingTicker.innerHTML = coinsHTML;
+  }
+  
+  if (dashboardTicker) {
+    dashboardTicker.innerHTML = coinsHTML;
+  }
+  
+  // Update status to live
+  setTickerStatus(true);
+}
+
+function setTickerStatus(live) {
+  isDelayed = !live;
+  const dots = document.querySelectorAll('.live-dot');
+  const texts = document.querySelectorAll('.live-text');
+  
+  dots.forEach(dot => {
+    dot.classList.toggle('delayed', !live);
+  });
+  
+  texts.forEach(text => {
+    text.classList.toggle('delayed', !live);
+    text.textContent = live ? 'Live' : 'Delayed';
+  });
+}
+
+async function fetchCryptoPrices() {
+  try {
+    const response = await fetch(COINGECKO_API);
+    
+    if (!response.ok) {
+      throw new Error('API request failed');
+    }
+    
+    const data = await response.json();
+    updateTickers(data);
+  } catch (error) {
+    console.warn('Failed to fetch crypto prices, using fallback:', error.message);
+    updateTickers(FALLBACK_PRICES);
+    setTickerStatus(false);
+  }
+}
+
+function startPriceTicker() {
+  // Fetch immediately
+  fetchCryptoPrices();
+  
+  // Then fetch every 30 seconds
+  if (tickerInterval) {
+    clearInterval(tickerInterval);
+  }
+  tickerInterval = setInterval(fetchCryptoPrices, 30000);
+}
+
+function stopPriceTicker() {
+  if (tickerInterval) {
+    clearInterval(tickerInterval);
+    tickerInterval = null;
+  }
+}
+
+// Start ticker on page load
+startPriceTicker();
+
 // ========== BOOT ==========
 
 async function boot() {

@@ -2514,6 +2514,195 @@ a:hover {
 }
 
 /* =========================================
+   CRYPTO PRICE TICKER
+   ========================================= */
+
+.crypto-ticker-container {
+  width: 100%;
+  background: rgba(10, 15, 26, 0.95);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  padding: 0;
+}
+
+.crypto-ticker-bar {
+  width: 100%;
+  background: rgba(10, 15, 26, 0.95);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.crypto-ticker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-xl);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.crypto-ticker::-webkit-scrollbar {
+  display: none;
+}
+
+.ticker-coin {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(0, 240, 255, 0.05);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: var(--radius-md);
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  min-width: 140px;
+}
+
+.ticker-coin:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.3);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.ticker-coin-icon {
+  font-size: 1.25rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ticker-coin-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ticker-coin-symbol {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ticker-coin-price {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.ticker-coin-change {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.ticker-coin-change.positive {
+  color: var(--glow-green);
+  text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+}
+
+.ticker-coin-change.negative {
+  color: var(--danger-red);
+  text-shadow: 0 0 8px rgba(255, 68, 102, 0.4);
+}
+
+.ticker-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-right: var(--space-xl);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--glow-green);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--glow-green);
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+.live-dot.delayed {
+  background: var(--warning-amber);
+  box-shadow: 0 0 10px var(--warning-amber);
+  animation: none;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+.live-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--glow-green);
+}
+
+.live-text.delayed {
+  color: var(--warning-amber);
+}
+
+/* Loading Skeleton */
+.ticker-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-xl);
+}
+
+.ticker-skeleton {
+  width: 140px;
+  height: 40px;
+  background: linear-gradient(90deg, 
+    rgba(0, 240, 255, 0.05) 0%, 
+    rgba(0, 240, 255, 0.1) 50%, 
+    rgba(0, 240, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: var(--radius-md);
+  animation: shimmer-ticker 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer-ticker {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Price flash animation */
+@keyframes price-flash-up {
+  0% { background-color: rgba(0, 255, 136, 0.3); }
+  100% { background-color: transparent; }
+}
+
+@keyframes price-flash-down {
+  0% { background-color: rgba(255, 68, 102, 0.3); }
+  100% { background-color: transparent; }
+}
+
+.ticker-coin.flash-up {
+  animation: price-flash-up 0.5s ease-out;
+}
+
+.ticker-coin.flash-down {
+  animation: price-flash-down 0.5s ease-out;
+}
+
+/* =========================================
    RESPONSIVE DESIGN
    ========================================= */
 
@@ -2525,6 +2714,65 @@ a:hover {
   
   .tier-selection {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 960px) {
+  .crypto-ticker {
+    gap: var(--space-md);
+  }
+  
+  .ticker-coin {
+    min-width: 120px;
+    padding: var(--space-xs) var(--space-sm);
+  }
+  
+  .ticker-coin-icon {
+    font-size: 1rem;
+  }
+  
+  .ticker-coin-price {
+    font-size: 0.75rem;
+  }
+  
+  .ticker-coin-change {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .crypto-ticker-container {
+    height: auto;
+  }
+  
+  .crypto-ticker-bar {
+    height: auto;
+    flex-direction: column;
+    padding: var(--space-sm) 0;
+  }
+  
+  .crypto-ticker {
+    width: 100%;
+    padding: var(--space-sm);
+    gap: var(--space-sm);
+  }
+  
+  .ticker-coin {
+    min-width: 100px;
+    padding: var(--space-xs) var(--space-sm);
+  }
+  
+  .ticker-coin-change {
+    display: none;
+  }
+  
+  .ticker-status {
+    padding: var(--space-xs) var(--space-md);
+  }
+  
+  .landing-page .crypto-ticker-container {
+    position: relative;
+    z-index: 50;
   }
 }
 
