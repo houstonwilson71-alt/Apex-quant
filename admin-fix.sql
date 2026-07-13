@@ -7,6 +7,28 @@
 -- 1. RLS Policies for Profiles (Admin can view all users)
 -- =====================================================
 
+-- Helper function used by policies to avoid recursive RLS checks
+-- on the same `profiles` table.
+CREATE OR REPLACE FUNCTION check_is_admin()
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1
+        FROM profiles
+        WHERE id = auth.uid()
+          AND is_admin = true
+          AND status = 'active'
+    );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION check_is_admin() TO authenticated;
+GRANT EXECUTE ON FUNCTION check_is_admin() TO anon;
+
 -- First, ensure profiles table has RLS enabled
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
@@ -14,6 +36,7 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
 DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
 DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Admins can update any profile" ON profiles;
 
 -- Users can view their own profile
 CREATE POLICY "Users can view own profile" ON profiles
@@ -25,23 +48,11 @@ CREATE POLICY "Users can update own profile" ON profiles
 
 -- Admins can view all profiles
 CREATE POLICY "Admins can view all profiles" ON profiles
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM profiles AS p
-            WHERE p.id = auth.uid()
-            AND p.is_admin = true
-        )
-    );
+    FOR SELECT USING (check_is_admin());
 
 -- Admins can update any profile
 CREATE POLICY "Admins can update any profile" ON profiles
-    FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM profiles AS p
-            WHERE p.id = auth.uid()
-            AND p.is_admin = true
-        )
-    );
+    FOR UPDATE USING (check_is_admin());
 
 -- =====================================================
 -- 2. RLS Policies for Investments (Admin can view all)
