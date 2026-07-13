@@ -6,19 +6,28 @@
   <title>Apex Quant Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body data-page="admin">
+  <!-- Background Effects -->
   <div class="bg-gradient"></div>
   <div class="bg-gradient bg-gradient-2"></div>
   <div class="bg-gradient bg-gradient-3"></div>
 
+  <div class="particles-container" aria-hidden="true">
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+    <div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div>
+  </div>
+
   <div class="admin-shell">
+    <!-- Auth View -->
     <div id="admin-auth-view" class="auth-wrapper">
       <div class="glass-card auth-card">
         <div class="auth-header">
-          <h1>Admin Access</h1>
+          <h1>🛡️ Admin Access</h1>
           <p>Sign in with the Apex Quant admin account</p>
         </div>
         <div id="admin-auth-error" class="error-message"></div>
@@ -36,80 +45,139 @@
       </div>
     </div>
 
+    <!-- Access Denied -->
     <div id="admin-denied" class="hidden">
-      <div class="glass-card auth-card">
-        <div class="auth-header">
-          <h1>Access Denied</h1>
-          <p>This page is restricted to the Apex Quant admin account.</p>
+      <div class="auth-wrapper">
+        <div class="glass-card auth-card">
+          <div class="auth-header">
+            <h1>Access Denied</h1>
+            <p>This page is restricted to the Apex Quant admin account.</p>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Admin Dashboard -->
     <div id="admin-dashboard" class="hidden admin-dashboard">
+      <!-- Sidebar -->
       <aside class="sidebar admin-sidebar">
         <div class="sidebar-header">
           <h2>🛡️ Admin</h2>
           <span>Apex Quant Control</span>
         </div>
         <nav class="sidebar-nav">
-          <a href="#" class="nav-item active" data-admin-section="overview" onclick="return false;">Overview</a>
-          <a href="#" class="nav-item" data-admin-section="users" onclick="return false;">Users</a>
-          <a href="#" class="nav-item" data-admin-section="deposits" onclick="return false;">Deposits</a>
-          <a href="#" class="nav-item" data-admin-section="withdrawals" onclick="return false;">Withdrawals</a>
-          <a href="#" class="nav-item" data-admin-section="investments" onclick="return false;">Investments</a>
+          <a href="#" class="nav-item active" data-admin-section="overview">
+            <span class="nav-icon">📊</span> Overview
+          </a>
+          <a href="#" class="nav-item" data-admin-section="users">
+            <span class="nav-icon">👥</span> Users
+          </a>
+          <a href="#" class="nav-item" data-admin-section="deposits">
+            <span class="nav-icon">💰</span> Deposits
+          </a>
+          <a href="#" class="nav-item" data-admin-section="withdrawals">
+            <span class="nav-icon">💸</span> Withdrawals
+          </a>
+          <a href="#" class="nav-item" data-admin-section="investments">
+            <span class="nav-icon">🤖</span> Investments
+          </a>
         </nav>
         <div class="sidebar-footer">
           <button id="admin-logout-btn" class="btn btn-logout" type="button">🚪 Sign Out</button>
         </div>
       </aside>
 
+      <!-- Main Content -->
       <main class="main-content admin-main">
+        <!-- Overview Section -->
         <section id="admin-overview" class="admin-section active">
           <div class="section-header">
             <h1>Admin Overview</h1>
             <p class="subtitle">Control balances, deposits, withdrawals, and user activity.</p>
           </div>
           <div class="stats-grid">
-            <div class="glass-card stat-card"><div class="stat-icon">👥</div><div class="stat-label">Total Users</div><div class="stat-value" id="admin-total-users">0</div></div>
-            <div class="glass-card stat-card"><div class="stat-icon">💳</div><div class="stat-label">Deposits</div><div class="stat-value" id="admin-total-deposits">0</div></div>
-            <div class="glass-card stat-card"><div class="stat-icon">💸</div><div class="stat-label">Withdrawals</div><div class="stat-value" id="admin-total-withdrawals">0</div></div>
-            <div class="glass-card stat-card"><div class="stat-icon">🤖</div><div class="stat-label">Active Investments</div><div class="stat-value" id="admin-active-investments">0</div></div>
+            <div class="glass-card stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-label">Total Users</div>
+              <div class="stat-value" id="admin-total-users">0</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-icon">💰</div>
+              <div class="stat-label">Deposits</div>
+              <div class="stat-value" id="admin-total-deposits">0</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-icon">💸</div>
+              <div class="stat-label">Withdrawals</div>
+              <div class="stat-value" id="admin-total-withdrawals">0</div>
+            </div>
+            <div class="glass-card stat-card">
+              <div class="stat-icon">🤖</div>
+              <div class="stat-label">Active Investments</div>
+              <div class="stat-value" id="admin-active-investments">0</div>
+            </div>
           </div>
         </section>
 
+        <!-- Users Section -->
         <section id="admin-users" class="admin-section">
-          <div class="section-header"><h1>Users</h1></div>
-          <div class="glass-card table-card"><div id="admin-users-table"></div></div>
+          <div class="section-header">
+            <h1>Users Management</h1>
+            <p class="subtitle">View and manage user accounts</p>
+          </div>
+          <div class="glass-card table-card">
+            <div id="admin-users-table"></div>
+          </div>
         </section>
 
+        <!-- Deposits Section -->
         <section id="admin-deposits" class="admin-section">
-          <div class="section-header"><h1>Deposits</h1></div>
-          <div class="glass-card table-card"><div id="admin-deposits-table"></div></div>
+          <div class="section-header">
+            <h1>Deposits</h1>
+            <p class="subtitle">Review and approve deposit requests</p>
+          </div>
+          <div class="glass-card table-card">
+            <div id="admin-deposits-table"></div>
+          </div>
         </section>
 
+        <!-- Withdrawals Section -->
         <section id="admin-withdrawals" class="admin-section">
-          <div class="section-header"><h1>Withdrawals</h1></div>
-          <div class="glass-card table-card"><div id="admin-withdrawals-table"></div></div>
+          <div class="section-header">
+            <h1>Withdrawals</h1>
+            <p class="subtitle">Review and approve withdrawal requests</p>
+          </div>
+          <div class="glass-card table-card">
+            <div id="admin-withdrawals-table"></div>
+          </div>
         </section>
 
+        <!-- Investments Section -->
         <section id="admin-investments" class="admin-section">
-          <div class="section-header"><h1>Investments</h1></div>
-          <div class="glass-card table-card"><div id="admin-investments-table"></div></div>
+          <div class="section-header">
+            <h1>Investments</h1>
+            <p class="subtitle">View all active and completed investments</p>
+          </div>
+          <div class="glass-card table-card">
+            <div id="admin-investments-table"></div>
+          </div>
         </section>
       </main>
     </div>
   </div>
 
+  <!-- Balance Adjustment Modal -->
   <div id="balance-adjustment-modal" class="modal hidden">
-    <div class="modal-card glass-card">
+    <div class="glass-card modal-card">
       <h3>Adjust Balance</h3>
+      <p style="color: var(--text-secondary); margin-bottom: 16px;">Enter a positive amount to add funds or negative to subtract.</p>
       <label class="form-group">
         <span>Amount</span>
-        <input id="admin-adjust-amount" type="number" step="0.01" required />
+        <input id="admin-adjust-amount" type="number" step="0.01" placeholder="e.g., 100 or -50" required />
       </label>
       <label class="form-group">
         <span>Reason</span>
-        <input id="admin-adjust-reason" type="text" placeholder="Bonus / correction" required />
+        <input id="admin-adjust-reason" type="text" placeholder="Bonus / Correction / Refund" required />
       </label>
       <div class="modal-actions">
         <button id="cancel-adjustment" class="btn btn-secondary" type="button">Cancel</button>

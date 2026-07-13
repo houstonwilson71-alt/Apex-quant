@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Apex Quant</title>
+  <title>Apex Quant - Intelligent Investing, Automated Profits</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Background Effects -->
   <div class="bg-gradient"></div>
   <div class="bg-gradient bg-gradient-2"></div>
   <div class="bg-gradient bg-gradient-3"></div>
@@ -22,8 +23,209 @@
   </div>
 
   <div class="app-shell">
-    <div id="auth-container" class="auth-wrapper hidden">
+    <!-- ========== LANDING PAGE ========== -->
+    <div id="landing-page" class="landing-page">
+      <!-- Navigation -->
+      <nav class="landing-nav">
+        <div class="logo">
+          <span>📊</span>
+          <span>Apex Quant</span>
+        </div>
+        <div class="nav-links">
+          <a href="#how-it-works">How It Works</a>
+          <a href="#tiers">Investment Tiers</a>
+          <a href="#benefits">Why Choose Us</a>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn btn-ghost" onclick="showAuthModal('login')">Login</button>
+          <button class="btn btn-primary" onclick="showAuthModal('signup')">Sign Up</button>
+        </div>
+      </nav>
+
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="hero-shapes">
+          <div class="hero-shape shape-1"></div>
+          <div class="hero-shape shape-2"></div>
+          <div class="hero-shape shape-3"></div>
+        </div>
+        <div class="hero-content">
+          <div class="hero-badge">
+            <span>✨</span>
+            <span>AI-Powered Quantum Trading</span>
+          </div>
+          <h1 class="hero-title">Intelligent Investing, Automated Profits</h1>
+          <p class="hero-subtitle">Apex Quant uses AI-powered quantum algorithms to generate guaranteed returns in just 14 days</p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary btn-lg" onclick="document.getElementById('tiers').scrollIntoView({behavior: 'smooth'})">Start Earning Now</button>
+            <button class="btn btn-secondary btn-lg" onclick="showAuthModal('signup')">Create Free Account</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works -->
+      <section id="how-it-works" class="section section-dark">
+        <div class="section-header">
+          <h2 class="section-title">How It Works</h2>
+          <p class="section-subtitle">Start earning in three simple steps</p>
+        </div>
+        <div class="how-it-works">
+          <div class="glass-card step-card">
+            <div class="step-number">1</div>
+            <span class="step-icon">💰</span>
+            <h3 class="step-title">Deposit USDT</h3>
+            <p class="step-desc">Send USDT to your personal wallet address on BSC or Tron network</p>
+            <div class="step-connector"></div>
+          </div>
+          <div class="glass-card step-card">
+            <div class="step-number">2</div>
+            <span class="step-icon">🤖</span>
+            <h3 class="step-title">AI Trades for You</h3>
+            <p class="step-desc">Our quantum AI algorithms analyze markets and execute profitable trades automatically</p>
+            <div class="step-connector"></div>
+          </div>
+          <div class="glass-card step-card">
+            <div class="step-number">3</div>
+            <span class="step-icon">📈</span>
+            <h3 class="step-title">Earn Returns in 14 Days</h3>
+            <p class="step-desc">Receive guaranteed returns directly to your account after the trading period</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Investment Tiers Preview -->
+      <section id="tiers" class="section">
+        <div class="section-header">
+          <h2 class="section-title">Investment Tiers</h2>
+          <p class="section-subtitle">Choose your investment level and watch your returns grow</p>
+        </div>
+        <div class="tiers-grid">
+          <div class="glass-card tier-preview-card tier-1">
+            <span class="tier-number">1</span>
+            <div class="tier-roi">100%</div>
+            <div class="tier-label">ROI</div>
+            <div class="tier-range">$100 - $499</div>
+          </div>
+          <div class="glass-card tier-preview-card tier-2">
+            <span class="tier-number">2</span>
+            <div class="tier-roi">150%</div>
+            <div class="tier-label">ROI</div>
+            <div class="tier-range">$500 - $3,999</div>
+          </div>
+          <div class="glass-card tier-preview-card tier-3">
+            <span class="tier-number">3</span>
+            <div class="tier-roi">200%</div>
+            <div class="tier-label">ROI</div>
+            <div class="tier-range">$4,000 - $9,999</div>
+          </div>
+          <div class="glass-card tier-preview-card tier-4">
+            <span class="tier-number">VIP</span>
+            <div class="tier-roi">300%</div>
+            <div class="tier-label">ROI</div>
+            <div class="tier-range">$10,000+</div>
+          </div>
+        </div>
+        <div class="tier-cta" style="text-align: center; margin-top: 32px;">
+          <button class="btn btn-primary btn-lg" onclick="showAuthModal('signup')">Sign Up to Start Investing</button>
+        </div>
+      </section>
+
+      <!-- Benefits -->
+      <section id="benefits" class="section section-dark">
+        <div class="section-header">
+          <h2 class="section-title">Why Choose Apex Quant</h2>
+          <p class="section-subtitle">Experience the future of intelligent investing</p>
+        </div>
+        <div class="benefits-grid">
+          <div class="glass-card benefit-card">
+            <span class="benefit-icon">🤖</span>
+            <h3 class="benefit-title">AI-Powered Trading</h3>
+            <p class="benefit-desc">Advanced quantum algorithms analyze markets 24/7 to find the best trading opportunities</p>
+          </div>
+          <div class="glass-card benefit-card">
+            <span class="benefit-icon">✅</span>
+            <h3 class="benefit-title">Guaranteed Returns</h3>
+            <p class="benefit-desc">Every investment is backed by our profit guarantee. Earn predictable returns every time</p>
+          </div>
+          <div class="glass-card benefit-card">
+            <span class="benefit-icon">⚡</span>
+            <h3 class="benefit-title">Fast Withdrawals</h3>
+            <p class="benefit-desc">Withdraw your earnings anytime with multiple withdrawal methods including USDT, PayPal, and Bank</p>
+          </div>
+          <div class="glass-card benefit-card">
+            <span class="benefit-icon">💬</span>
+            <h3 class="benefit-title">24/7 Support</h3>
+            <p class="benefit-desc">Our dedicated support team is always available to help you with any questions</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      <section class="section">
+        <div class="section-header">
+          <h2 class="section-title">What Our Investors Say</h2>
+          <p class="section-subtitle">Join thousands of successful investors</p>
+        </div>
+        <div class="testimonials-grid">
+          <div class="glass-card testimonial-card">
+            <p class="testimonial-quote">"Apex Quant has completely changed my investment strategy. The returns are consistent and the platform is incredibly easy to use."</p>
+            <div class="testimonial-author">
+              <img src="https://ui-avatars.com/api/?name=Sarah+Chen&background=d4a853&color=0a0e17" alt="Sarah Chen" class="testimonial-avatar" />
+              <div>
+                <div class="testimonial-name">Sarah Chen</div>
+                <div class="testimonial-role">Tech Entrepreneur</div>
+              </div>
+            </div>
+          </div>
+          <div class="glass-card testimonial-card">
+            <p class="testimonial-quote">"I've tried many trading platforms before, but nothing comes close to the results I've seen with Apex Quant. Highly recommended!"</p>
+            <div class="testimonial-author">
+              <img src="https://ui-avatars.com/api/?name=Marcus+Johnson&background=d4a853&color=0a0e17" alt="Marcus Johnson" class="testimonial-avatar" />
+              <div>
+                <div class="testimonial-name">Marcus Johnson</div>
+                <div class="testimonial-role">Financial Analyst</div>
+              </div>
+            </div>
+          </div>
+          <div class="glass-card testimonial-card">
+            <p class="testimonial-quote">"The automated trading system is amazing. I just deposit and watch my money grow. No stress, just profits!"</p>
+            <div class="testimonial-author">
+              <img src="https://ui-avatars.com/api/?name=Elena+Rodriguez&background=d4a853&color=0a0e17" alt="Elena Rodriguez" class="testimonial-avatar" />
+              <div>
+                <div class="testimonial-name">Elena Rodriguez</div>
+                <div class="testimonial-role">Small Business Owner</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="landing-footer">
+        <div class="footer-content">
+          <div class="footer-logo">📊 Apex Quant</div>
+          <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Contact</a>
+          </div>
+          <div class="footer-social">
+            <a href="#" title="Twitter">𝕏</a>
+            <a href="#" title="Telegram">✈</a>
+            <a href="#" title="Discord">💬</a>
+          </div>
+          <div class="footer-copyright">
+            © 2024 Apex Quant. All rights reserved.
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ========== AUTH MODAL ========== -->
+    <div id="auth-modal" class="modal hidden">
       <div class="glass-card auth-card">
+        <button class="modal-close" onclick="closeAuthModal()" style="position: absolute; top: 16px; right: 16px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.5rem;">×</button>
+        
         <div id="login-form" class="auth-form active">
           <div class="auth-header">
             <h1>Welcome Back</h1>
@@ -43,7 +245,7 @@
           </form>
           <div class="form-footer">
             <button id="show-reset-password" class="btn-link" type="button">Forgot password?</button>
-            <p>Don’t have an account? <button id="show-signup" class="btn-link" type="button">Sign up</button></p>
+            <p>Don't have an account? <button id="show-signup" class="btn-link" type="button">Sign up</button></p>
           </div>
         </div>
 
@@ -77,7 +279,7 @@
         <div id="reset-password-form" class="auth-form">
           <div class="auth-header">
             <h1>Reset Password</h1>
-            <p>We’ll send you a reset link</p>
+            <p>We'll send you a reset link</p>
           </div>
           <div id="reset-error" class="error-message"></div>
           <div id="reset-success" class="success-message"></div>
@@ -95,18 +297,48 @@
       </div>
     </div>
 
+    <!-- ========== DASHBOARD ========== -->
     <div id="dashboard-container" class="dashboard-layout hidden">
+      <!-- Sidebar -->
       <aside class="sidebar">
         <div class="sidebar-header">
-          <h2>📊 Apex Quant</h2>
-          <span>Investment Platform</span>
+          <div class="sidebar-header-left">
+            <h2>📊 Apex Quant</h2>
+            <span>Investment Platform</span>
+          </div>
+          <div class="notification-bell" onclick="toggleNotificationPanel()">
+            <span class="bell-icon">🔔</span>
+            <span class="notification-badge" id="notification-badge" style="display: none;"></span>
+          </div>
         </div>
+        
+        <!-- Notification Panel -->
+        <div class="notification-panel" id="notification-panel">
+          <div class="notification-panel-header">Notifications</div>
+          <div id="notification-list">
+            <div class="notification-empty">No notifications yet</div>
+          </div>
+        </div>
+        
         <nav class="sidebar-nav">
-          <a href="#" class="nav-item active" data-section="home" onclick="navigateTo('home'); return false;">🏠 Home</a>
-          <a href="#" class="nav-item" data-section="trading-ai" onclick="navigateTo('trading-ai'); return false;">🤖 Trading AI</a>
-          <a href="#" class="nav-item" data-section="deposit" onclick="navigateTo('deposit'); return false;">💰 Deposit</a>
-          <a href="#" class="nav-item" data-section="withdraw" onclick="navigateTo('withdraw'); return false;">💸 Withdraw</a>
-          <a href="#" class="nav-item" data-section="contact" onclick="navigateTo('contact'); return false;">📞 Support</a>
+          <a href="#" class="nav-item active" data-section="home" onclick="navigateTo('home'); return false;">
+            <span class="nav-icon">🏠</span> Home
+          </a>
+          <a href="#" class="nav-item" data-section="trading-ai" onclick="navigateTo('trading-ai'); return false;">
+            <span class="nav-icon">🤖</span> Trading AI
+          </a>
+          <a href="#" class="nav-item" data-section="deposit" onclick="navigateTo('deposit'); return false;">
+            <span class="nav-icon">💰</span> Deposit
+          </a>
+          <a href="#" class="nav-item" data-section="withdraw" onclick="navigateTo('withdraw'); return false;">
+            <span class="nav-icon">💸</span> Withdraw
+          </a>
+          <a href="#" class="nav-item" data-section="history" onclick="navigateTo('history'); return false;">
+            <span class="nav-icon">📋</span> History
+          </a>
+          <a href="#" class="nav-item" data-section="contact" onclick="navigateTo('contact'); return false;">
+            <span class="nav-icon">📞</span> Support
+          </a>
         </nav>
         <div class="sidebar-footer">
           <div class="user-info" id="sidebar-user-email">User</div>
@@ -115,7 +347,9 @@
         <button class="mobile-menu-toggle" onclick="toggleMobileMenu()" type="button">☰</button>
       </aside>
 
+      <!-- Main Content -->
       <main class="main-content">
+        <!-- Home Section -->
         <section id="section-home" class="dashboard-section active">
           <div class="section-header">
             <h1>Dashboard Overview</h1>
@@ -153,10 +387,16 @@
 
           <div class="glass-card activity-card">
             <h3>Recent Activity</h3>
-            <div id="recent-activity-list"><p class="empty-state">No recent activity</p></div>
+            <div id="recent-activity-list">
+              <div class="empty-state">
+                <span class="empty-icon">📭</span>
+                <p>No recent activity</p>
+              </div>
+            </div>
           </div>
         </section>
 
+        <!-- Trading AI Section -->
         <section id="section-trading-ai" class="dashboard-section">
           <div class="section-header">
             <h1>Trading AI</h1>
@@ -221,6 +461,7 @@
           </div>
         </section>
 
+        <!-- Deposit Section -->
         <section id="section-deposit" class="dashboard-section">
           <div class="section-header">
             <h1>Deposit USDT</h1>
@@ -241,7 +482,7 @@
                 </div>
               </div>
 
-              <div id="network-bsc" class="network-info">
+              <div id="network-bsc" class="network-info active">
                 <div class="qr-container">
                   <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0xbe438a2c7fe9bb534a8b8d06c96e42e9b6620812" alt="BSC QR Code" class="qr-code" />
                 </div>
@@ -254,7 +495,7 @@
                 </div>
               </div>
 
-              <div id="network-tron" class="network-info" style="display:none;">
+              <div id="network-tron" class="network-info">
                 <div class="qr-container">
                   <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TEmM5aKQTcwQSdnZMGXMeEJMHB6Ko7noqJ" alt="TRON QR Code" class="qr-code" />
                 </div>
@@ -297,6 +538,7 @@
           </div>
         </section>
 
+        <!-- Withdraw Section -->
         <section id="section-withdraw" class="dashboard-section">
           <div class="section-header">
             <h1>Withdraw Funds</h1>
@@ -337,8 +579,15 @@
                 </label>
               </div>
               <div id="method-details-usdt" class="method-details">
+                <div class="network-sub-option show" id="usdt-network-option">
+                  <span class="network-sub-label">Select Network</span>
+                  <div class="network-sub-buttons">
+                    <button type="button" class="network-sub-btn active" data-network="bep20" onclick="selectWithdrawNetwork('bep20')">BSC (BEP-20)</button>
+                    <button type="button" class="network-sub-btn" data-network="trc20" onclick="selectWithdrawNetwork('trc20')">Tron (TRC-20)</button>
+                  </div>
+                </div>
                 <label class="form-group">
-                  <span>USDT (BEP-20) Address</span>
+                  <span id="usdt-address-label">USDT (BEP-20) Address</span>
                   <input id="usdt-address" type="text" placeholder="0x..." />
                 </label>
               </div>
@@ -364,10 +613,29 @@
           </div>
         </section>
 
+        <!-- History Section -->
+        <section id="section-history" class="dashboard-section">
+          <div class="section-header">
+            <h1>Transaction History</h1>
+            <p class="subtitle">View all your deposits and withdrawals</p>
+          </div>
+
+          <div class="glass-card" style="padding: 24px;">
+            <div class="history-tabs">
+              <button class="history-tab active" data-filter="all" onclick="filterHistory('all')">All</button>
+              <button class="history-tab" data-filter="deposit" onclick="filterHistory('deposit')">Deposits</button>
+              <button class="history-tab" data-filter="withdrawal" onclick="filterHistory('withdrawal')">Withdrawals</button>
+            </div>
+            <div id="combined-history-list"></div>
+            <div id="history-pagination" style="text-align: center; margin-top: 20px;"></div>
+          </div>
+        </section>
+
+        <!-- Contact Section -->
         <section id="section-contact" class="dashboard-section">
           <div class="section-header">
             <h1>Contact Support</h1>
-            <p class="subtitle">We’re here to help. Send us a message and we’ll get back to you.</p>
+            <p class="subtitle">We're here to help. Send us a message and we'll get back to you.</p>
           </div>
           <div class="glass-card contact-card">
             <form id="contact-form" class="formspree-form" action="https://formspree.io/f/mpqvabgw" method="POST">
